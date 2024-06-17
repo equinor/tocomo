@@ -1,9 +1,8 @@
 """Demo app for experimenting with CO2 impurities reactions"""
 
-def parse_reaction_string(reactions_string):
+def parse_reaction_string(reactions_strings):
     reactions = {}
-    index = 1
-    for line in reactions_string.splitlines():
+    for index, line in reactions_strings.items():
         line = line.strip()
         if not line or line.startswith("#"):
             continue
@@ -92,15 +91,16 @@ def run_model_sm1(concentrations, reactions, *, verbose=False, stepping=False):
                 print()
 
 def main():
-    reactions_string = """
-    NO2 + SO2 + H2O -> NO + H2SO4
-    2 NO + O2 -> 2 NO2
-    H2S + 3 NO2 -> SO2 + H2O + 3 NO
-    3 NO2 + H2O -> 2 HNO3 + NO
-    """
+    reactions_strings = {
+        1: "NO2 + SO2 + H2O -> NO + H2SO4",
+        2: "2 NO + O2 -> 2 NO2",
+        3: "H2S + 3 NO2 -> SO2 + H2O + 3 NO",
+        4: "3 NO2 + H2O -> 2 HNO3 + NO"
+    }
 
-    reactions = parse_reaction_string(reactions_string)
-    #print(*reactions.items(), sep='\n')
+    for i, r in reactions_strings.items():
+        print(f"Reaction {i}: {r}")
+    reactions = parse_reaction_string(reactions_strings)
 
     initial_concentrations = {'H2O': 40, 'H2S': 35, 'H2SO4': 30, 'HNO3' : 25, 'NO': 20, 'NO2': 15, 'O2': 10, 'SO2': 5}
 
