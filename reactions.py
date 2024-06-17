@@ -52,43 +52,41 @@ def print_values(concentrations, *, newline=True):
     if newline:
         print()
 
-def can_react(concentrations, reaction, *, timestep=1):
+def can_react(concentrations, reaction):
+    """Return the number of times a given reaction can happen"""
+    coeff_multipliers = []
     for substance, coeff in reaction['coefficients'].items():
         if coeff < 0:
-            if concentrations[substance] < -coeff * timestep:
-                return False
-    return True
+            m = concentrations[substance] / -coeff
+            coeff_multipliers.append(m)
+    if any(m < 0.001 for m in coeff_multipliers):
+        return 0
+    else:
+        return min(coeff_multipliers)
 
-def do_react(concentrations, reaction, *, timestep=1):
+def do_react(concentrations, reaction, *, multiplier=1):
     for substance, coeff in reaction['coefficients'].items():
-        concentrations[substance] += coeff * timestep
+        concentrations[substance] += coeff * multiplier
 
 def run_model_sm1(concentrations, reactions, *, verbose=False, stepping=False):
-
+    reaction_priorities = [3, 2, 1, 4]
     if verbose:
-        print_values(concentrations)
-
-    did_react = True
-    while did_react:
-
-        did_react = False
-
-        reaction_order = [3, 2, 1, 4]
-
-        for i in reaction_order:
-            timestep = 0.001
+        print("Priorities:", reaction_priorities)
+    while True:    
+        for i in reaction_priorities:
             r = reactions[i]
-            if can_react(concentrations, r, timestep=timestep):
-                do_react(concentrations, r, timestep=timestep)
-                did_react = True
+            if m := can_react(concentrations, r):
+                do_react(concentrations, r, multiplier=m)
+                if verbose:
+                    print_values(concentrations, newline=False)
+                    print("    ### after applying reaction", i, "*", m, r, end='')
+                    if stepping:
+                        input()
+                    else:
+                        print()
                 break
-        if verbose:
-            print_values(concentrations, newline=False)
-            print("    ### after applying reaction", i, r, end='')
-            if stepping:
-                input()
-            else:
-                print()
+        else:
+            return
 
 def main():
     reactions_strings = {
