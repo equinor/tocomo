@@ -68,7 +68,7 @@ def do_react(concentrations, reaction, *, multiplier=1):
     for substance, coeff in reaction['coefficients'].items():
         concentrations[substance] += coeff * multiplier
 
-def run_model_sm1(concentrations, reactions, *, verbose=False, stepping=False):
+def run_model_sm1(concentrations, reactions, *, verbose=False):
     reaction_priorities = [3, 2, 1, 4]
     if verbose:
         print("Priorities:", reaction_priorities)
@@ -79,11 +79,7 @@ def run_model_sm1(concentrations, reactions, *, verbose=False, stepping=False):
                 do_react(concentrations, r, multiplier=m)
                 if verbose:
                     print_values(concentrations, newline=False)
-                    print("    ### after applying reaction", i, "*", m, r, end='')
-                    if stepping:
-                        input()
-                    else:
-                        print()
+                    print(f"    ### after applying reaction {i} * {m:.3f} {r}")
                 break
         else:
             return
