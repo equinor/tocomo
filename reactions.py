@@ -7,7 +7,11 @@ def parse_reaction_string(reactions_string):
         line = line.strip()
         if not line or line.startswith("#"):
             continue
-        reaction_part, rate_part = line.split(";")
+        if ';' in line:
+            reaction_part, rate_part = line.split(";")
+        else:
+            reaction_part = line
+            rate_part = 1
         rate = float(rate_part)
         reactants_part, products_part = reaction_part.split("->")
         reactants_terms, products_terms = reactants_part.split('+'), products_part.split('+')
