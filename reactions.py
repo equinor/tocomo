@@ -93,10 +93,10 @@ def run_model_sm1(concentrations, reactions, *, verbose=False, stepping=False):
 
 def main():
     reactions_string = """
-    NO2 + SO2 + H2O -> NO + H2SO4; 1
-    2 NO + O2 -> 2 NO2; 1
-    H2S + 3 NO2 -> SO2 + H2O + 3 NO; 1
-    3 NO2 + H2O -> 2 HNO3 + NO; 0.001
+    NO2 + SO2 + H2O -> NO + H2SO4
+    2 NO + O2 -> 2 NO2
+    H2S + 3 NO2 -> SO2 + H2O + 3 NO
+    3 NO2 + H2O -> 2 HNO3 + NO
     """
 
     reactions = parse_reaction_string(reactions_string)
