@@ -64,7 +64,7 @@ def do_react(concentrations, reaction, *, timestep=1):
     for substance, coeff in reaction['coefficients'].items():
         concentrations[substance] += coeff * timestep
 
-def run_model_1324(concentrations, reactions, *, verbose=False, stepping=False):
+def run_model_sm1(concentrations, reactions, *, verbose=False, stepping=False):
 
     if verbose:
         print_values(concentrations)
@@ -72,17 +72,18 @@ def run_model_1324(concentrations, reactions, *, verbose=False, stepping=False):
     did_react = True
     while did_react:
 
-        reaction_order = [1, 3, 2, 4]
         did_react = False
 
-        r = None
+        reaction_order = [3, 2, 1, 4]
+
         for i in reaction_order:
+            timestep = 0.001
             r = reactions[i]
-            if can_react(concentrations, r):
-                do_react(concentrations, r)
+            if can_react(concentrations, r, timestep=timestep):
+                do_react(concentrations, r, timestep=timestep)
                 did_react = True
                 break
-        if verbose or stepping:
+        if verbose:
             print_values(concentrations, newline=False)
             print("    ### after applying reaction", i, r, end='')
             if stepping:
@@ -106,7 +107,7 @@ def main():
     concentrations = initial_concentrations.copy()
     print_header(concentrations)
     print_values(concentrations)
-    run_model_1324(concentrations, reactions, verbose=True, stepping=False)
+    run_model_sm1(concentrations, reactions, verbose=False, stepping=True)
     print_values(concentrations)
     
 if __name__ == "__main__":
