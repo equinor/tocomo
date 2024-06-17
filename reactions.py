@@ -16,7 +16,7 @@ def parse_reaction_string(reactions_string):
             term = term.strip()
             if ' ' in term:
                 coeff, reactant = term.split()
-                coeff = int(coeff)
+                coeff = float(coeff)
             else:
                 coeff = 1
                 reactant = term
@@ -25,7 +25,7 @@ def parse_reaction_string(reactions_string):
             term = term.strip()
             if ' ' in term:
                 coeff, product = term.split()
-                coeff = int(coeff)
+                coeff = float(coeff)
             else:
                 coeff = 1
                 product = term
