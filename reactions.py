@@ -100,8 +100,17 @@ def main():
         print(f"Reaction {i}: {r}")
     reactions = parse_reaction_string(reactions_strings)
 
-    initial_concentrations = {'H2O': 40, 'H2S': 35, 'H2SO4': 30, 'HNO3' : 25, 'NO': 20, 'NO2': 15, 'O2': 10, 'SO2': 5}
-
+    initial_concentrations = {
+        'H2O': 30, 
+        'O2': 10, 
+        'SO2': 0,
+        'NO2': 1.5, 
+        'H2S': 3, 
+        'H2SO4': 0, 
+        'HNO3' : 0, 
+        'NO': 0, 
+    }
+    
     concentrations = initial_concentrations.copy()
     print_header(concentrations)
     print_values(concentrations)
