@@ -48,7 +48,7 @@ def print_values(concentrations, *, newline=True):
     substances = sorted(concentrations.keys())
     for s in substances:
         v = concentrations[s]
-        print(f"{v:8.2f}", end='')
+        print(f"{v:8.1f}", end='')
     if newline:
         print()
 
