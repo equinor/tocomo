@@ -81,6 +81,30 @@ def run_model_sm1(concentrations, reactions, *, verbose=False):
         else:
             return
 
+def normalize(concentrations):
+    for k, v in concentrations.items():
+        concentrations[k] = round(v,1)
+    return concentrations
+    
+def selftest(reactions, run_model):    
+    """Test agains SM CO2 spec mass balance model Excel spread sheet (18 jun 2024)"""
+
+    concentrations = {'H2O': 40, 'O2': 15, 'SO2': 0, 'NO2': 15, 'H2S': 3, 'H2SO4': 0, 'HNO3' : 0, 'NO': 0}
+    run_model(concentrations, reactions)
+    assert normalize(concentrations) == normalize({'H2O': 32.5, 'O2': 5.3, 'SO2': 0.0, 'NO2': 0.0, 'H2S': 0.0, 'H2SO4': 3.0, 'HNO3' : 15.0, 'NO': 0.0})
+
+    concentrations = {'H2O': 20, 'O2': 15, 'SO2': 0, 'NO2': 15, 'H2S': 3, 'H2SO4': 0, 'HNO3' : 0, 'NO': 0}
+    run_model(concentrations, reactions)
+    assert normalize(concentrations) == normalize({'H2O': 12.5, 'O2': 5.3, 'SO2': 0.0, 'NO2': 0.0, 'H2S': 0.0, 'H2SO4': 3.0, 'HNO3' : 15.0, 'NO': 0.0})
+
+    concentrations = {'H2O': 20, 'O2': 5, 'SO2': 0, 'NO2': 8, 'H2S': 3, 'H2SO4': 0, 'HNO3' : 0, 'NO': 0}
+    run_model(concentrations, reactions)
+    assert normalize(concentrations) == normalize({'H2O': 18.0, 'O2': 0.0, 'SO2': 0.0, 'NO2': 0.0, 'H2S': 0.0, 'H2SO4': 3.0, 'HNO3' : 4.0, 'NO': 4.0})
+
+    concentrations = {'H2O': 20, 'O2': 5, 'SO2': 0, 'NO2': 8, 'H2S': 7, 'H2SO4': 0, 'HNO3' : 0, 'NO': 0}
+    run_model(concentrations, reactions)
+    assert normalize(concentrations) == normalize({'H2O': 26.0, 'O2': 0.0, 'SO2': 6.0, 'NO2': 0.0, 'H2S': 1.0, 'H2SO4': 0.0, 'HNO3' : 0.0, 'NO': 8.0})    
+
 def main():
     reactions_strings = {
         1: "NO2 + SO2 + H2O -> NO + H2SO4",
@@ -92,6 +116,8 @@ def main():
     for i, r in reactions_strings.items():
         print(f"Reaction {i}: {r}")
     reactions = parse_reaction_string(reactions_strings)
+
+    selftest(reactions, run_model_sm1)
 
     initial_concentrations = {
         'H2O': 30, 
