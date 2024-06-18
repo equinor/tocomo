@@ -133,7 +133,8 @@ def main():
     concentrations = initial_concentrations.copy()
     print_header(concentrations)
     print_values(concentrations)
-    run_model_sm1(concentrations, reactions, verbose=True)
+    run_model_sm1(concentrations, reactions, verbose=False)
+    print_header(concentrations)
     print_values(concentrations)
     
 if __name__ == "__main__":
