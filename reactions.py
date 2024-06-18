@@ -33,8 +33,7 @@ def parse_reaction_string(reactions_strings):
                 coeff = 1
                 product = term
             coefficients[product] = +coeff
-        reactions[index] = {'coefficients': coefficients, 'rate': rate}
-        index += 1
+        reactions[index] = {'coefficients': coefficients, 'rate': rate, 'id' : index, 'eq': line}
     return reactions
 
 def print_header(concentrations, *, newline=True):
