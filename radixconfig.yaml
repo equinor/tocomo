@@ -1,0 +1,40 @@
+apiVersion: radix.equinor.com/v1
+kind: RadixApplication
+metadata:
+  name: c2d2-web-portal-test
+spec:
+  environments:
+    - name: dev
+      build:
+        from: main
+  dnsAlias:
+    - alias: co2spec
+      component: auth-proxy
+      environment: dev
+  components:
+    - name: auth-proxy
+      ports:
+        - name: http
+          port: 8001
+      publicPort: http
+      authentication:
+        oauth2:
+          clientId: 88209e7f-6df5-43f3-baeb-913f09a80635
+          scope: openid profile email offline_access
+          setXAuthRequestHeaders: true
+          setAuthorizationHeader: true
+          sessionStoreType: redis
+          redisStore:
+            connectionUrl: redis://redis:6379
+    - name: redis
+      image: bitnami/redis:latest
+      secrets:
+        - REDIS_PASSWORD
+      ports:
+        - name: redis
+          port: 6379
+    - name: frontend
+      src: .
+      ports:
+        - name: http
+          port: 8001
