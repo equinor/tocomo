@@ -63,22 +63,20 @@ def can_react(concentrations, reaction):
     else:
         return min(coeff_multipliers)
 
-def do_react(concentrations, reaction, *, multiplier=1):
+def do_react(concentrations, reaction, *, multiplier=1, verbose=False):
     for substance, coeff in reaction['coefficients'].items():
         concentrations[substance] += coeff * multiplier
+    if verbose:
+        print_values(concentrations, newline=False)
+        print(f"    ### after applying eq {reaction['id']} * {multiplier:.3f} : {reaction['eq']} ")
 
 def run_model_sm1(concentrations, reactions, *, verbose=False):
     reaction_priorities = [3, 2, 1, 4]
-    if verbose:
-        print("Priorities:", reaction_priorities)
-    while True:    
+    while True:
         for i in reaction_priorities:
             r = reactions[i]
             if m := can_react(concentrations, r):
-                do_react(concentrations, r, multiplier=m)
-                if verbose:
-                    print_values(concentrations, newline=False)
-                    print(f"    ### after applying reaction {i} * {m:.3f} {r}")
+                do_react(concentrations, r, multiplier=m, verbose=verbose)
                 break
         else:
             return
