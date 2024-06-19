@@ -19,7 +19,7 @@ spec:
       publicPort: http
       authentication:
         oauth2:
-          clientId: 88209e7f-6df5-43f3-baeb-913f09a80635
+          clientId: a4f4519a-fafb-48c2-9a5c-3ba38309a824
           scope: openid profile email offline_access
           setXAuthRequestHeaders: true
           setAuthorizationHeader: true
