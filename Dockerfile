@@ -1,8 +1,7 @@
 from python:3.11-slim
 
 
-COPY main.py /app/
-COPY reactions.py /app/
+COPY backend app
 
 RUN pip install fastapi
 
