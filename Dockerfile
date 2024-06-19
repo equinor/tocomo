@@ -9,4 +9,4 @@ WORKDIR /app
 
 USER 1001
 
-CMD [ "fastapi", "dev", "main.py"]
+CMD [ "fastapi", "run","--port", "5005", "main.py"]

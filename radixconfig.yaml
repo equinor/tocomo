@@ -15,7 +15,7 @@ spec:
     - name: auth-proxy
       ports:
         - name: http
-          port: 8001
+          port: 5005
       publicPort: http
       authentication:
         oauth2:
