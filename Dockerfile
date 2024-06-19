@@ -1,4 +1,12 @@
 from python:3.11-slim
 
 
+COPY main.py /app/
+
+RUN pip install fastapi
+
+WORKDIR /app
+
 USER 1001
+
+CMD [ "fastapi", "dev", "main.py"]
