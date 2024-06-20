@@ -1,7 +1,19 @@
 from fastapi import FastAPI
 from reactions import run_model_sm1, parse_reaction_string
+from starlette.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
+
+
+# Setup CORS middleware so your React frontend can talk to this backend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['http://localhost:3000'],  # Allows the frontend origin
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/run_reactions")
@@ -37,3 +49,8 @@ async def run_reactions(
     run_model_sm1(concentrations, reactions, verbose=False)
 
     return concentrations
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
