@@ -1,0 +1,23 @@
+FROM node:14
+
+WORKDIR /app
+
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Install TypeScript globally
+RUN npm install -g typescript
+
+# Install serve globally 
+RUN npm install -g serve
+
+COPY . .
+
+RUN npm run build
+
+EXPOSE 3000
+
+CMD [ "serve", "-s", "dist" ]
+

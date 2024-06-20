@@ -9,14 +9,18 @@ spec:
         from: main
   dnsAlias:
     - alias: co2spec
-      component: auth-proxy
+      component: frontend
+      environment: dev
+    - alias: api
+      component: backend
       environment: dev
   components:
-    - name: auth-proxy
+    - name: frontend
       ports:
         - name: http
-          port: 5005
+          port: 3000
       publicPort: http
+      src: frontend/Dockerfile
       authentication:
         oauth2:
           clientId: a4f4519a-fafb-48c2-9a5c-3ba38309a824
@@ -33,3 +37,8 @@ spec:
       ports:
         - name: redis
           port: 6379
+    - name: backend
+      src: backend/Dockerfile
+      ports:
+        - name: http
+          port: 5005
