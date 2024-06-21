@@ -11,4 +11,4 @@ USER 1001
 
 EXPOSE 5005
 
-CMD [ "fastapi", "run","--port", "5005", "main.py"]
+CMD [ "python", "main.py"]
