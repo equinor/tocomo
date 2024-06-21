@@ -11,9 +11,6 @@ spec:
     - alias: co2spec
       component: frontend
       environment: dev
-    - alias: api
-      component: backend
-      environment: dev
   components:
     - name: frontend
       ports:
