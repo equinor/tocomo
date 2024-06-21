@@ -6,7 +6,7 @@ spec:
   environments:
     - name: dev
       build:
-        from: main
+        from: frontend
   dnsAlias:
     - alias: co2spec
       component: frontend
