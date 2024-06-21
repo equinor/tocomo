@@ -1,7 +1,7 @@
 from python:3.11-slim
 
 
-COPY backend app
+COPY . app
 
 RUN pip install fastapi
 
