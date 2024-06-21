@@ -9,7 +9,7 @@ app = FastAPI()
 # Setup CORS middleware so your React frontend can talk to this backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['http://localhost:3000'],  # Allows the frontend origin
+    allow_origins=['http://localhost:5173'],  # Allows the frontend origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -53,4 +53,4 @@ async def run_reactions(
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=5005)
