@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:16
 
 WORKDIR /app
 
@@ -21,5 +21,6 @@ USER 1001
 
 EXPOSE 3000
 
-CMD [ "serve", "-s", "dist" ]
+CMD [ "npm" , "run", "dev"]
+
 
