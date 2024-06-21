@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from 'react';
+import { useState, FormEvent } from 'react';
 
 interface ChemicalValues {
   H2O: number;
@@ -59,7 +59,7 @@ function App() {
               <input
                 type="number"
                 name={key}
-                value={inputs[key]}
+                value={initialValue}
                 onChange={handleInputChange}
               />
             </label>
