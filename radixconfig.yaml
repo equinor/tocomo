@@ -39,3 +39,12 @@ spec:
       ports:
         - name: http
           port: 5005
+      authentication:
+        oauth2:
+          clientId: a4f4519a-fafb-48c2-9a5c-3ba38309a824
+          scope: openid profile email offline_access
+          setXAuthRequestHeaders: true
+          setAuthorizationHeader: true
+          sessionStoreType: redis
+          redisStore:
+            connectionUrl: redis://redis:6379
