@@ -2,14 +2,18 @@ from fastapi import FastAPI
 from reactions import run_model_sm1, parse_reaction_string
 from starlette.middleware.cors import CORSMiddleware
 
-
 app = FastAPI()
 
+origins = [
+    "http://localhost:5005",
+    "https://co2spec.playground.radix.equinor.com/",
+    "https://frontend-c2d2-web-portal-test-dev.playground.radix.equinor.com/",
+]
 
 # Setup CORS middleware so your React frontend can talk to this backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows the frontend origin
+    allow_origins=origins,  # Allows the frontend origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
