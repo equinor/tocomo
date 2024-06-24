@@ -10,9 +10,6 @@ RUN npm install
 # Install TypeScript globally
 RUN npm install -g typescript
 
-# Install serve globally 
-RUN npm install -g serve
-
 COPY . .
 
 RUN npm run build
