@@ -17,7 +17,10 @@ COPY . .
 
 RUN npm run build
 
-USER 1001
+# Application needs owner permissions at runtime
+RUN chown -R node:node /app
+
+USER node
 
 EXPOSE 3000
 
