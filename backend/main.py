@@ -6,8 +6,8 @@ app = FastAPI()
 
 origins = [
     "http://localhost:5005",
-    "https://co2spec.playground.radix.equinor.com/",
-    "https://frontend-c2d2-web-portal-test-dev.playground.radix.equinor.com/",
+    "https://co2spec.playground.radix.equinor.com",
+    "https://frontend-c2d2-web-portal-test-dev.playground.radix.equinor.com",
 ]
 
 # Setup CORS middleware so your React frontend can talk to this backend
