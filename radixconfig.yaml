@@ -39,6 +39,7 @@ spec:
       ports:
         - name: http
           port: 5005
+      publicPort: http
       authentication:
         oauth2:
           clientId: a4f4519a-fafb-48c2-9a5c-3ba38309a824
