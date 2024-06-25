@@ -5,7 +5,7 @@ from starlette.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 origins = [
-    "http://localhost:5005",
+    "http://localhost:3000",
     "https://co2spec.playground.radix.equinor.com",
     "https://frontend-c2d2-web-portal-test-dev.playground.radix.equinor.com",
 ]
