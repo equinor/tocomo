@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:latest as build-stage
 
 WORKDIR /app
 
@@ -14,13 +14,12 @@ COPY . .
 
 RUN npm run build
 
-# Application needs owner permissions at runtime
-RUN chown -R 1001:1001 /app
+FROM nginx:stable-alpine as production-stage
 
-USER 1001
+COPY --chown=101 --from=build-stage /app/dist /usr/share/nginx/html
+
+COPY --chown=101 ./nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 3000
 
-CMD [ "npm" , "run", "dev"]
-
-
+CMD ["nginx", "-g", "daemon off;"]
