@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, ChangeEvent } from 'react';
 
 interface ChemicalValues {
   H2O: number;
@@ -26,20 +26,20 @@ const baseURL: string = `https://backend-c2d2-web-portal-test-dev.playground.rad
 // const baseURL: string = `http://localhost:5005`
 
 function App() {
-  const [inputs, setInputs] = useState<ChemicalValues>(defaultValues);
+  const [input, setInput] = useState<ChemicalValues>(defaultValues);
   const [output, setOutput] = useState<ChemicalValues>(defaultValues);
 
-  const handleInputChange = (event: FormEvent<HTMLInputElement>) => {
-    const { name, valueAsNumber } = event.currentTarget;
-    setInputs(prev => ({
-      ...prev,
-      [name]: isNaN(valueAsNumber) ? 0 : valueAsNumber  // Use 0 if the value is not a number
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setInput(prevValues => ({
+      ...prevValues,
+      [name]: parseFloat(value) || 0,
     }));
   };
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();  // Prevent the form from submitting traditionally
-    const queryParams = new URLSearchParams(Object.entries(inputs) as [string, string][]).toString();
+    const queryParams = new URLSearchParams(Object.entries(input) as [string, string][]).toString();
     const url = `${baseURL}/run_reactions?${queryParams}`;
     fetch(url)
       .then(response => response.json())
@@ -52,14 +52,14 @@ function App() {
       <h1>CO2 spec demo</h1>
       <form onSubmit={handleSubmit}>
         {/* Generate input fields for user-defined values */}
-        {Object.entries(defaultValues).map(([key, initialValue]) => (
+        {Object.entries(input).map(([key, value]) => (
           <div key={key}>
             <label>
               {`${key}: `}
               <input
                 type="number"
                 name={key}
-                value={initialValue}
+                value={value}
                 onChange={handleInputChange}
               />
             </label>
