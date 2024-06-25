@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from reactions import run_model_sm1, parse_reaction_string
-from starlette.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
