@@ -22,8 +22,10 @@ const defaultValues: ChemicalValues = {
   NO: 0,
 };
 
-const baseURL: string = `https://backend-c2d2-web-portal-test-dev.playground.radix.equinor.com`
+//const baseURL: string = `https://backend-c2d2-web-portal-test-dev.playground.radix.equinor.com`
+//const baseURL: string = `https://frontend-c2d2-web-portal-test-dev.playground.radix.equinor.com`
 // const baseURL: string = `http://localhost:5005`
+const baseURL: string = ""
 
 function App() {
   const [input, setInput] = useState<ChemicalValues>(defaultValues);
