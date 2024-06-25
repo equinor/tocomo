@@ -10,6 +10,10 @@ origins = [
     "https://frontend-c2d2-web-portal-test-dev.playground.radix.equinor.com",
 ]
 
+@app.get("/hello")
+async def hello():
+    return {"message": "Hello from backend"}
+
 # Setup CORS middleware so your React frontend can talk to this backend
 app.add_middleware(
     CORSMiddleware,
