@@ -10,7 +10,7 @@ origins = [
     "https://frontend-c2d2-web-portal-test-dev.playground.radix.equinor.com",
 ]
 
-@app.get("/hello")
+@app.get("/api/hello")
 async def hello():
     return {"message": "Hello from backend"}
 
@@ -24,7 +24,7 @@ app.add_middleware(
 )
 
 
-@app.get("/run_reactions")
+@app.get("/api/run_reactions")
 async def run_reactions(
     H2O: float = 0,
     O2: float = 0,

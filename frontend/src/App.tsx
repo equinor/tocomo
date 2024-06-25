@@ -43,7 +43,7 @@ function App() {
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();  // Prevent the form from submitting traditionally
     const queryParams = new URLSearchParams(Object.entries(input) as [string, string][]).toString();
-    const url = `${baseURL}/run_reactions?${queryParams}`;
+    const url = `${baseURL}/api/run_reactions?${queryParams}`;
     fetch(url)
       .then(response => response.json())
       .then(data => setOutput(data))
