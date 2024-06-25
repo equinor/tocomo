@@ -12,11 +12,11 @@ interface ChemicalValues {
 }
 
 const defaultValues: ChemicalValues = {
-  H2O: 0,
-  O2: 0,
+  H2O: 40,
+  O2: 30,
   SO2: 0,
-  NO2: 0,
-  H2S: 0,
+  NO2: 20,
+  H2S: 10,
   H2SO4: 0,
   HNO3: 0,
   NO: 0,
