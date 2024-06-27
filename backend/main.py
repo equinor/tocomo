@@ -36,14 +36,6 @@ async def run_reactions(
     NO: float = 0,
 ):
 
-    reactions_strings = {
-        1: "NO2 + SO2 + H2O -> NO + H2SO4",
-        2: "2 NO + O2 -> 2 NO2",
-        3: "H2S + 3 NO2 -> SO2 + H2O + 3 NO",
-        4: "3 NO2 + H2O -> 2 HNO3 + NO",
-    }
-
-    reactions = parse_reaction_string(reactions_strings)
     concentrations = {
         "H2O": H2O,
         "O2": O2,
@@ -54,7 +46,7 @@ async def run_reactions(
         "HNO3": HNO3,
         "NO": NO,
     }
-    run_model_sm1(concentrations, reactions, verbose=False)
+    run_model_sm1(concentrations, verbose=False)
 
     return concentrations
 
