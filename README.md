@@ -24,7 +24,7 @@ loop until no more reactions possible:
   else stop the loop
 ```
 
-## Local setup
+## Local setup (also on Codespace)
 
 The application can be run locally quite easily using Docker. A docker compose file has been added which will build and start all components necessary. The setup has also been tested in a codespace environment. Stand in root and run:
 
