@@ -50,6 +50,9 @@ docker build -t backend_image .
 docker run -t backend_image --p 5005:5005
 ```
 
+Go to <http://127.0.0.1:5005/docs> in your browser to see the swagger page for the
+backend
+
 ### Frontend
 
 The frontend is written in react. In order to start the frontend do the
@@ -67,6 +70,10 @@ It is also possible to start the backend using the Dockerfile:
 docker build -t frontend_image .
 docker run -t frontend_image --p 3000:3000
 ```
+
+Navigate to <http://localhost:3000> in your browser to see the frontend. Given
+that the backend exists it should now be possible to insert numbers and click
+the run reactions button
 
 ### Docker compose
 
