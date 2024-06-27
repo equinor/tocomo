@@ -1,4 +1,5 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
+import './App.css';
 
 interface ChemicalValues {
   H2O: number;
@@ -54,31 +55,64 @@ function App() {
     <>
       <h1>CO2 spec demo</h1>
       <form onSubmit={handleSubmit}>
-        {/* Generate input fields for user-defined values */}
+        <table className="input-table">
+          <tbody>
         {Object.entries(input).map(([key, value]) => (
-          <div key={key}>
-            <label>
-              {`${key}: `}
+              <tr key={key}>
+                <td><label htmlFor={key}>{key}</label></td>
+                <td>
               <input
                 type="number"
+                    id={key}
                 name={key}
                 value={value}
                 onChange={handleInputChange}
               />
-            </label>
-          </div>
+                </td>
+              </tr>
         ))}
+          </tbody>
+        </table>
         <button type="submit">Run Reactions</button>
       </form>
       {output && (
         <div>
           <h2>Results:</h2>
-          {/* Show the result after fetching */}
+          <table className="results-table">
+            <tbody>
           {Object.entries(output).map(([key, value], index) => (
-            <p key={index}>{`${key} content after reactions is ${value.toFixed(2)}`}</p>
+                <tr key={index}>
+                  <td>{key}</td>
+                  <td>{value.toFixed(2)}</td>
+                </tr>
           ))}
+            </tbody>
+          </table>
         </div>
       )}
+
+      <div>
+        <h2>Notes:</h2>
+        <pre className="notes">
+          {`
+Here are the reactions that are currently implemented:
+
+  1: "NO2 + SO2 + H2O -> NO + H2SO4"
+  2: "2 NO + O2 -> 2 NO2"
+  3: "H2S + 3 NO2 -> SO2 + H2O + 3 NO"
+  4: "3 NO2 + H2O -> 2 HNO3 + NO"
+
+Pseudo algorithm:
+
+loop until no more reactions possible:
+  do reaction 3 if possible
+  else do reaction 2 if possible
+  else do reaction 1 if possible
+  else do reaction 4 if possible
+  else stop the loop
+`}
+        </pre>
+      </div>   
     </>
   );
 }

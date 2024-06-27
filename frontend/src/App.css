@@ -40,3 +40,20 @@
 .read-the-docs {
   color: #888;
 }
+
+.results-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.results-table td {
+  border: 1px solid black;
+  padding: 8px;
+  text-align: left;
+}
+
+.notes {
+  text-align: left;
+  white-space: pre-wrap; /* Ensures that long lines are wrapped */
+  font-family: monospace; /* Optional: Use monospace font for <pre> */
+}
