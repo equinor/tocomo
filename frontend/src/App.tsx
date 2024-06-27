@@ -1,7 +1,23 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
 import './App.css';
 
-interface ChemicalValues {
+interface InputChemicalValues {
+  H2O: number;
+  O2: number;
+  SO2: number;
+  NO2: number;
+  H2S: number;
+}
+
+const defaultInputValues: InputChemicalValues = {
+  H2O: 40,
+  O2: 30,
+  SO2: 0,
+  NO2: 20,
+  H2S: 10,
+};
+
+interface OutputChemicalValues {
   H2O: number;
   O2: number;
   SO2: number;
@@ -12,12 +28,12 @@ interface ChemicalValues {
   NO: number;
 }
 
-const defaultValues: ChemicalValues = {
-  H2O: 40,
-  O2: 30,
+const defaultOutputValues: OutputChemicalValues = {
+  H2O: 0,
+  O2: 0,
   SO2: 0,
-  NO2: 20,
-  H2S: 10,
+  NO2: 0,
+  H2S: 0,
   H2SO4: 0,
   HNO3: 0,
   NO: 0,
@@ -30,8 +46,8 @@ const defaultValues: ChemicalValues = {
 const baseURL: string = ""
 
 function App() {
-  const [input, setInput] = useState<ChemicalValues>(defaultValues);
-  const [output, setOutput] = useState<ChemicalValues>(defaultValues);
+  const [input, setInput] = useState<InputChemicalValues>(defaultInputValues);
+  const [output, setOutput] = useState<OutputChemicalValues>(defaultOutputValues);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
