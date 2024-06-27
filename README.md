@@ -4,14 +4,23 @@ The CO<sub>2</sub> specification demo was made to simplify calculations of
 chemical reactions, specifically when CO<sub>2</sub> is mixed with water
 together with other reactants. The following reactions take place:
 
-  1: NO2 + SO2 + H2O -> NO + H2SO4 2: 2 NO + O2 -> 2 NO2 3: H2S + 3 NO2 -> SO2 +
-  H2O + 3 NO 4: 3 NO2 + H2O -> 2 HNO3 + NO
+```
+  1: NO2 + SO2 + H2O -> NO + H2SO4
+  2: 2 NO + O2 -> 2 NO2
+  3: H2S + 3 NO2 -> SO2 + H2O + 3 NO
+  4: 3 NO2 + H2O -> 2 HNO3 + NO
+```
 
 The Pseudo algorithm use:
 
-loop until no more reactions possible: do reaction 3 if possible else do
-reaction 2 if possible else do reaction 1 if possible else do reaction 4 if
-possible else stop the loop
+```
+loop until no more reactions possible:
+  do reaction 3 if possible
+  else do reaction 2 if possible
+  else do reaction 1 if possible
+  else do reaction 4 if possible
+  else stop the loop
+```
 
 ## Developers
 
