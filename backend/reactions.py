@@ -84,13 +84,18 @@ def do_react(concentrations, reaction, *, verbose=False):
 
 
 def run_model_sm1(concentrations, *, verbose=False):
-    """Run reaction model as discussed with Sven Morten June 18."""
+    """
+    Run reaction model as discussed with Sven Morten June 18.
+    Updated with two more equations (5 and 6)
+    """
 
     reactions_strings = {
         1: "NO2 + SO2 + H2O -> NO + H2SO4",
         2: "2 NO + O2 -> 2 NO2",
         3: "H2S + 3 NO2 -> SO2 + H2O + 3 NO",
-        4: "3 NO2 + H2O -> 2 HNO3 + NO"
+        4: "3 NO2 + H2O -> 2 HNO3 + NO",
+        5: "2 NO2 + H2O-> HNO3 + HNO2",
+        6: "8 H2S + 4 O2 -> 8 H2O + S8"
     }
     reactions = parse_reaction_string(reactions_strings)
 
@@ -104,6 +109,8 @@ def run_model_sm1(concentrations, *, verbose=False):
             do_react(concentrations, reactions[1], verbose=verbose)
         elif can_react(concentrations, reactions[4]):
             do_react(concentrations, reactions[4], verbose=verbose)
+        elif can_react(concentrations, reactions[6]):
+            do_react(concentrations, reactions[6], verbose=verbose)
         else:
             reactions_possible = False
     return
@@ -121,21 +128,21 @@ def selftest():
 
     run_model = run_model_sm1
 
-    concentrations = {'H2O': 40, 'O2': 15, 'SO2': 0, 'NO2': 15, 'H2S': 3, 'H2SO4': 0, 'HNO3': 0, 'NO': 0}
+    concentrations = {'H2O': 40, 'O2': 15, 'SO2': 0, 'NO2': 15, 'H2S': 3, 'H2SO4': 0, 'HNO3': 0, 'NO': 0, 'HNO2': 0, 'S8': 0}
     run_model(concentrations)
-    assert normalize(concentrations) == normalize({'H2O': 32.5, 'O2': 5.3, 'SO2': 0.0, 'NO2': 0.0, 'H2S': 0.0, 'H2SO4': 3.0, 'HNO3': 15.0, 'NO': 0.0})
+    assert normalize(concentrations) == normalize({'H2O': 32.5, 'O2': 5.3, 'SO2': 0.0, 'NO2': 0.0, 'H2S': 0.0, 'H2SO4': 3.0, 'HNO3': 15.0, 'NO': 0.0, 'HNO2': 0, 'S8': 0})
 
-    concentrations = {'H2O': 20, 'O2': 15, 'SO2': 0, 'NO2': 15, 'H2S': 3, 'H2SO4': 0, 'HNO3': 0, 'NO': 0}
+    concentrations = {'H2O': 20, 'O2': 15, 'SO2': 0, 'NO2': 15, 'H2S': 3, 'H2SO4': 0, 'HNO3': 0, 'NO': 0, 'HNO2': 0, 'S8': 0}
     run_model(concentrations)
-    assert normalize(concentrations) == normalize({'H2O': 12.5, 'O2': 5.3, 'SO2': 0.0, 'NO2': 0.0, 'H2S': 0.0, 'H2SO4': 3.0, 'HNO3': 15.0, 'NO': 0.0})
+    assert normalize(concentrations) == normalize({'H2O': 12.5, 'O2': 5.3, 'SO2': 0.0, 'NO2': 0.0, 'H2S': 0.0, 'H2SO4': 3.0, 'HNO3': 15.0, 'NO': 0.0, 'HNO2': 0, 'S8': 0})
 
-    concentrations = {'H2O': 20, 'O2': 5, 'SO2': 0, 'NO2': 8, 'H2S': 3, 'H2SO4': 0, 'HNO3': 0, 'NO': 0}
+    concentrations = {'H2O': 20, 'O2': 5, 'SO2': 0, 'NO2': 8, 'H2S': 3, 'H2SO4': 0, 'HNO3': 0, 'NO': 0, 'HNO2': 0, 'S8': 0}
     run_model(concentrations)
-    assert normalize(concentrations) == normalize({'H2O': 18.0, 'O2': 0.0, 'SO2': 0.0, 'NO2': 0.0, 'H2S': 0.0, 'H2SO4': 3.0, 'HNO3': 4.0, 'NO': 4.0})
+    assert normalize(concentrations) == normalize({'H2O': 18.0, 'O2': 0.0, 'SO2': 0.0, 'NO2': 0.0, 'H2S': 0.0, 'H2SO4': 3.0, 'HNO3': 4.0, 'NO': 4.0, 'HNO2': 0, 'S8': 0})
 
-    concentrations = {'H2O': 20, 'O2': 5, 'SO2': 0, 'NO2': 8, 'H2S': 7, 'H2SO4': 0, 'HNO3': 0, 'NO': 0}
+    concentrations = {'H2O': 20, 'O2': 5, 'SO2': 0, 'NO2': 8, 'H2S': 7, 'H2SO4': 0, 'HNO3': 0, 'NO': 0, 'HNO2': 0, 'S8': 0}
     run_model(concentrations)
-    assert normalize(concentrations) == normalize({'H2O': 26.0, 'O2': 0.0, 'SO2': 6.0, 'NO2': 0.0, 'H2S': 1.0, 'H2SO4': 0.0, 'HNO3': 0.0, 'NO': 8.0})
+    assert normalize(concentrations) == normalize({'H2O': 26.0, 'O2': 0.0, 'SO2': 6.0, 'NO2': 0.0, 'H2S': 1.0, 'H2SO4': 0.0, 'HNO3': 0.0, 'NO': 8.0, 'HNO2': 0, 'S8': 0})
 
 
 def main():
@@ -152,6 +159,8 @@ def main():
         'H2SO4': 0,
         'HNO3': 0,
         'NO': 0,
+        'HNO2': 0,
+        'S8': 0,
     }
 
     concentrations = initial_concentrations.copy()

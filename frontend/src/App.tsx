@@ -26,6 +26,8 @@ interface OutputChemicalValues {
   H2SO4: number;
   HNO3: number;
   NO: number;
+  HNO2: number;
+  S8: number;
 }
 
 const defaultOutputValues: OutputChemicalValues = {
@@ -37,6 +39,8 @@ const defaultOutputValues: OutputChemicalValues = {
   H2SO4: 0,
   HNO3: 0,
   NO: 0,
+  HNO2: 0,
+  S8: 0,
 };
 
 //const baseURL: string = `https://backend-c2d2-web-portal-test-dev.playground.radix.equinor.com`
@@ -113,10 +117,12 @@ function App() {
           {`
 Here are the reactions that are currently implemented:
 
-  1: "NO2 + SO2 + H2O -> NO + H2SO4"
-  2: "2 NO + O2 -> 2 NO2"
-  3: "H2S + 3 NO2 -> SO2 + H2O + 3 NO"
-  4: "3 NO2 + H2O -> 2 HNO3 + NO"
+        1: "NO2 + SO2 + H2O -> NO + H2SO4",
+        2: "2 NO + O2 -> 2 NO2",
+        3: "H2S + 3 NO2 -> SO2 + H2O + 3 NO",
+        4: "3 NO2 + H2O -> 2 HNO3 + NO",
+        5: "2 NO2 + H2O-> HNO3 + HNO2",
+        6: "8 H2S + 4 O2 -> 8 H2O + S8".
 
 Pseudo algorithm:
 
@@ -125,6 +131,7 @@ loop until no more reactions possible:
   else do reaction 2 if possible
   else do reaction 1 if possible
   else do reaction 4 if possible
+  else do reaction 6 if possible
   else stop the loop
 `}
         </pre>

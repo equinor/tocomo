@@ -34,6 +34,8 @@ async def run_reactions(
     H2SO4: float = 0,
     HNO3: float = 0,
     NO: float = 0,
+    HNO2: float = 0,
+    S8: float = 0,
 ):
 
     concentrations = {
@@ -45,6 +47,8 @@ async def run_reactions(
         "H2SO4": H2SO4,
         "HNO3": HNO3,
         "NO": NO,
+        "HNO2": HNO2,
+        "S8": S8,
     }
     run_model_sm1(concentrations, verbose=False)
 
