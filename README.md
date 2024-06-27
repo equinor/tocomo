@@ -24,6 +24,16 @@ loop until no more reactions possible:
   else stop the loop
 ```
 
+## Local setup
+
+The application can be run locally quite easily using Docker. A docker compose file has been added which will build and start all components necessary. The setup has also been tested in a codespace environment. Stand in root and run:
+
+```
+docker compose up
+```
+
+The required ports in codespace will automatically be forwarded and you can open the application in your web browser.
+
 ## Developers
 
 The application consist of a frontend in React and a backend in Python. Each
@@ -76,7 +86,3 @@ docker run -t frontend_image --p 3000:3000
 Navigate to <http://localhost:3000> in your browser to see the frontend. Given
 that the backend exists it should now be possible to insert numbers and click
 the run reactions button
-
-### Docker compose
-
-The docker compose file builds and starts both frontend and backend.
