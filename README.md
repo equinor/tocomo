@@ -1,5 +1,7 @@
 # CO<sub>2</sub>specdemo
 
+The application is hosted on radix, visit our page [here](https://co2spec.playground.radix.equinor.com)
+
 The CO<sub>2</sub> specification demo was made to simplify calculations of
 chemical reactions, specifically when CO<sub>2</sub> is mixed with water
 together with other reactants. The following reactions take place:
