@@ -115,24 +115,26 @@ function App() {
         <h2>Notes:</h2>
         <pre className="notes">
           {`
-Here are the reactions that are currently implemented:
+Pseudo algorithm of current implementation
 
-        1: "NO2 + SO2 + H2O -> NO + H2SO4",
-        2: "2 NO + O2 -> 2 NO2",
-        3: "H2S + 3 NO2 -> SO2 + H2O + 3 NO",
-        4: "3 NO2 + H2O -> 2 HNO3 + NO",
-        5: "2 NO2 + H2O-> HNO3 + HNO2",
-        6: "8 H2S + 4 O2 -> 8 H2O + S8".
+1: NO2 + SO2 + H2O -> NO + H2SO4
+2: 2 NO + O2 -> 2 NO2
+3: H2S + 3 NO2 -> SO2 + H2O + 3 NO
+4: 3 NO2 + H2O -> 2 HNO3 + NO
+5: 2 NO2 + H2O-> HNO3 + HNO2        # not used
+6: 8 H2S + 4 O2 -> 8 H2O + S8
 
-Pseudo algorithm:
+initial concentrations
 
 loop until no more reactions possible:
-  do reaction 3 if possible
+  do      reaction 3 if possible
   else do reaction 2 if possible
   else do reaction 1 if possible
   else do reaction 4 if possible
   else do reaction 6 if possible
   else stop the loop
+
+show concentrations when no more reactions possible
 `}
         </pre>
       </div>   
