@@ -1,28 +1,14 @@
 # CO<sub>2</sub>specdemo
 
-The application is hosted on radix, visit our page [here](https://co2spec.playground.radix.equinor.com)
+This CO<sub>2</sub> spec demo calculator was made to democratize the dicussions
+about the consequences of mixing liquid CO<sub>2</sub> with impurities. Current
+focus is to implement that algorithms as described by Sven Morten Hesjevik and
+Anne Marie Koren Halvorsen.
 
-The CO<sub>2</sub> specification demo was made to simplify calculations of
-chemical reactions, specifically when CO<sub>2</sub> is mixed with water
-together with other reactants. The following reactions take place:
-
-```
-  1: NO2 + SO2 + H2O -> NO + H2SO4
-  2: 2 NO + O2 -> 2 NO2
-  3: H2S + 3 NO2 -> SO2 + H2O + 3 NO
-  4: 3 NO2 + H2O -> 2 HNO3 + NO
-```
-
-The Pseudo algorithm use:
-
-```
-loop until no more reactions possible:
-  do reaction 3 if possible
-  else do reaction 2 if possible
-  else do reaction 1 if possible
-  else do reaction 4 if possible
-  else stop the loop
-```
+Useful links:
+- The application as hosted on Radix [https://co2spec.playground.radix.equinor.com](https://co2spec.playground.radix.equinor.com)
+- The CO<sub>2</sub> impurities [SDP](https://colab.equinor.com/technologies/103E7E25-DE69-4ED0-8A35-AC91C41AD524/summary) T21-00334
+- Description of our [activity](https://ccs-data-digital.radix.equinor.com/activities/co2spec/)
 
 ## Local setup (also on Codespace)
 
