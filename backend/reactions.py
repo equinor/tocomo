@@ -65,7 +65,6 @@ def can_react(concentrations, reaction):
         if coeff < 0:
             m = concentrations[substance] / -coeff
             coeff_multipliers.append(m)
-    assert all(m >= 0 for m in coeff_multipliers)
     if any(m < 0.001 for m in coeff_multipliers):
         return 0
     else:
