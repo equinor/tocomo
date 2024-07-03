@@ -8,6 +8,9 @@ interface InputChemicalValues {
   SO2: number;
   NO2: number;
   H2S: number;
+  inner_diameter: number;
+  drop_out_length: number;
+  flowrate: number;
 }
 
 const defaultInputValues: InputChemicalValues = {
@@ -16,6 +19,9 @@ const defaultInputValues: InputChemicalValues = {
   SO2: 0,
   NO2: 20,
   H2S: 10,
+  inner_diameter: 30,
+  drop_out_length: 1000,
+  flowrate: 20,
 };
 
 interface OutputChemicalValues {
@@ -29,6 +35,9 @@ interface OutputChemicalValues {
   NO: number;
   HNO2: number;
   S8: number;
+  HNO3_corrosion: number,
+  H2SO4_corrision: number,
+  corrosion_rate: number,
 }
 
 const defaultOutputValues: OutputChemicalValues = {
@@ -42,6 +51,9 @@ const defaultOutputValues: OutputChemicalValues = {
   NO: 0,
   HNO2: 0,
   S8: 0,
+  HNO3_corrosion: 0,
+  H2SO4_corrision: 0,
+  corrosion_rate: 0,
 };
 
 const baseURL: string = ""

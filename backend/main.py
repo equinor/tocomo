@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import itertools
 import pandas as pd
 from reactions import run_model_sm1, parse_reaction_string
+from corrosion_calc import surface_area, corrosion_rate_HNO3, corrosion_rate_H2SO4
 from fastapi.middleware.cors import CORSMiddleware
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -92,6 +93,22 @@ def wrap_runmodel(argument):
     return argument
 
 
+# This is a helper function we use to apply over our data frame. Should not be edited
+def wrap_corrosion_calc(argument):
+    kwargs = argument.to_dict()
+    area = surface_area(kwargs["inner_diameter"], kwargs["drop_out_length"])
+    argument["H2SO4_corrosion"] = corrosion_rate_H2SO4(
+        area, kwargs["flowrate"], kwargs["H2SO4"]
+    )
+    argument["HNO3_corrosion"] = corrosion_rate_HNO3(
+        area, kwargs["flowrate"], kwargs["HNO3"]
+    )
+    argument["corrosion_rate"] = (
+        argument["H2SO4_corrosion"] + argument["HNO3_corrosion"]
+    )
+    return argument
+
+
 @app.get("/api/run_matrix")
 async def run_matrix(
     row: str = "",
@@ -107,6 +124,9 @@ async def run_matrix(
     NO: float = 0,
     HNO2: float = 0,
     S8: float = 0,
+    inner_diameter: float = 0,
+    drop_out_length: float = 0,
+    flowrate: float = 0,
 ):
 
     constituents = [column, row]
@@ -126,8 +146,16 @@ async def run_matrix(
         result["NO2"] = NO2
     if "H2S" not in [row, column]:
         result["H2S"] = H2S
+    if "inner_diameter" not in [row, column]:
+        result["inner_diameter"] = inner_diameter
+    if "drop_out_length" not in [row, column]:
+        result["drop_out_length"] = drop_out_length
+    if "flowrate" not in [row, column]:
+        result["flowrate"] = flowrate
 
     result = result.apply(wrap_runmodel, axis=1)
+    result = result.apply(wrap_corrosion_calc, axis=1)
+
     # Specify size for the final figure here
     fig, ax = plt.subplots(figsize=(12, 7))
 
