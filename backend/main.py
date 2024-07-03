@@ -48,7 +48,6 @@ async def run_reactions(
     HNO2: float = 0,
     S8: float = 0,
 ):
-
     concentrations = {
         "H2O": H2O,
         "O2": O2,
@@ -109,26 +108,24 @@ def wrap_corrosion_calc(argument):
     return argument
 
 
-@app.get("/api/run_matrix")
-async def run_matrix(
-    row: str = "",
-    column: str = "",
-    values: str = "",
-    H2O: float = 0,
-    O2: float = 0,
-    SO2: float = 0,
-    NO2: float = 0,
-    H2S: float = 0,
-    H2SO4: float = 0,
-    HNO3: float = 0,
-    NO: float = 0,
-    HNO2: float = 0,
-    S8: float = 0,
-    inner_diameter: float = 0,
-    drop_out_length: float = 0,
-    flowrate: float = 0,
+def constract_df(
+    row,
+    column,
+    values,
+    H2O,
+    O2,
+    SO2,
+    NO2,
+    H2S,
+    H2SO4,
+    HNO3,
+    NO,
+    HNO2,
+    S8,
+    inner_diameter,
+    drop_out_length,
+    flowrate,
 ):
-
     constituents = [column, row]
 
     indices = [(i / 2) + 0.5 for i in range(20)]
@@ -156,11 +153,92 @@ async def run_matrix(
     result = result.apply(wrap_runmodel, axis=1)
     result = result.apply(wrap_corrosion_calc, axis=1)
 
+    # The index parameter is used as the "vertical" axis, while the column parameter is the "horizontal" axis
+    plot_df = result.pivot_table(index=row, columns=column, values=values)
+    return plot_df
+
+
+@app.get("/api/export_csv")
+async def export_csv(
+    row: str = "",
+    column: str = "",
+    values: str = "",
+    H2O: float = 0,
+    O2: float = 0,
+    SO2: float = 0,
+    NO2: float = 0,
+    H2S: float = 0,
+    H2SO4: float = 0,
+    HNO3: float = 0,
+    NO: float = 0,
+    HNO2: float = 0,
+    S8: float = 0,
+    inner_diameter: float = 0,
+    drop_out_length: float = 0,
+    flowrate: float = 0,
+):
+    plot_df = constract_df(
+        row,
+        column,
+        values,
+        H2O,
+        O2,
+        SO2,
+        NO2,
+        H2S,
+        H2SO4,
+        HNO3,
+        NO,
+        HNO2,
+        S8,
+        inner_diameter,
+        drop_out_length,
+        flowrate,
+    )
+    return plot_df.to_csv()
+
+
+@app.get("/api/run_matrix")
+async def run_matrix(
+    row: str = "",
+    column: str = "",
+    values: str = "",
+    H2O: float = 0,
+    O2: float = 0,
+    SO2: float = 0,
+    NO2: float = 0,
+    H2S: float = 0,
+    H2SO4: float = 0,
+    HNO3: float = 0,
+    NO: float = 0,
+    HNO2: float = 0,
+    S8: float = 0,
+    inner_diameter: float = 0,
+    drop_out_length: float = 0,
+    flowrate: float = 0,
+):
+    plot_df = constract_df(
+        row,
+        column,
+        values,
+        H2O,
+        O2,
+        SO2,
+        NO2,
+        H2S,
+        H2SO4,
+        HNO3,
+        NO,
+        HNO2,
+        S8,
+        inner_diameter,
+        drop_out_length,
+        flowrate,
+    )
+
     # Specify size for the final figure here
     fig, ax = plt.subplots(figsize=(12, 7))
 
-    # The index parameter is used as the "vertical" axis, while the column parameter is the "horizontal" axis
-    plot_df = result.pivot_table(index=row, columns=column, values=values)
     sns.heatmap(plot_df, annot=True, ax=ax, cmap="YlOrBr")
     # Save the Seaborn plot to a BytesIO object
     img = BytesIO()

@@ -2,6 +2,7 @@ import { useState, FormEvent, ChangeEvent } from 'react';
 import './App.css';
 import Dropdown from './DropdownComponent';
 
+
 interface InputChemicalValues {
   H2O: number;
   O2: number;
@@ -67,6 +68,7 @@ function App() {
   const [valuename, setValuename] = useState("");
 
   const [matrix_url, setMatrix_url] = useState("");
+  const [csv_url, setCSV_url] = useState("");
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -80,6 +82,7 @@ function App() {
     event.preventDefault();  // Prevent the form from submitting traditionally
     const queryParams = new URLSearchParams(Object.entries(input) as [string, string][]).toString();
     setMatrix_url(`${baseURL}/api/run_matrix?row=${row}&column=${column}&values=${valuename}&${queryParams}`);
+    setCSV_url(`${baseURL}/api/export_csv?row=${row}&column=${column}&values=${valuename}&${queryParams}`);
     const url = `${baseURL}/api/run_reactions?${queryParams}`;
     fetch(url)
       .then(response => response.json())
@@ -98,6 +101,38 @@ function App() {
   const handleValuenameSelect = (value: string) => {
     setValuename(value)
   };
+
+  async function downloadCSV(endpoint: string, filename: string) {
+    try {
+        const response = await fetch(endpoint, {
+            method: 'GET',
+            headers: {
+                // Add any required headers here
+            }
+        });
+
+        if (response.status === 200) {
+            // Retrieve the CSV from the response
+            const blob = await response.blob();
+
+            // Create a link and trigger the download
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.setAttribute('download', filename); // Any filename you want to give it
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } else {
+            console.error('Error fetching CSV:', response.status);
+            // You may want to handle any errors, e.g., showing an alert to the user
+        }
+    } catch (error) {
+        console.error('Error downloading CSV:', error);
+        // Handle the error
+    }
+  }
+
 
   const options = Object.keys(defaultInputValues).map(key => ({
     value: key,
@@ -165,6 +200,9 @@ function App() {
         </div>
       )}
       <img src={matrix_url} alt="Seaborn Plot" />
+      <button onClick={() => downloadCSV(csv_url, 'export.csv')}>
+        Download CSV
+      </button>
       <div>
         <h2>Notes:</h2>
         <pre className="notes">
