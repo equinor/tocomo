@@ -1,6 +1,14 @@
 from fastapi import FastAPI
+import itertools
+import pandas as pd
 from reactions import run_model_sm1, parse_reaction_string
 from fastapi.middleware.cors import CORSMiddleware
+import seaborn as sns
+import matplotlib.pyplot as plt
+from io import BytesIO
+
+
+from fastapi.responses import StreamingResponse
 
 app = FastAPI()
 
@@ -10,9 +18,11 @@ origins = [
     "https://frontend-c2d2-web-portal-test-dev.playground.radix.equinor.com",
 ]
 
+
 @app.get("/api/hello")
 async def hello():
     return {"message": "Hello from backend"}
+
 
 # Setup CORS middleware so your React frontend can talk to this backend
 app.add_middleware(
@@ -55,6 +65,84 @@ async def run_reactions(
     return concentrations
 
 
+CHEMICALS = [
+    "H2O",
+    "O2",
+    "SO2",
+    "NO2",
+    "H2S",
+    "H2SO4",
+    "HNO3",
+    "NO",
+    "HNO2",
+    "S8",
+]
+
+
+# This is a helper function we use to apply over our data frame. Should not be edited
+def wrap_runmodel(argument):
+    concentrations = argument.to_dict()
+    concentrations["NO"] = 0
+    concentrations["H2SO4"] = 0
+    concentrations["HNO3"] = 0
+    run_model_sm1(concentrations)
+    argument["H2SO4"] = concentrations["H2SO4"]
+    argument["HNO3"] = concentrations["HNO3"]
+
+    return argument
+
+
+@app.get("/api/run_matrix")
+async def run_matrix(
+    row: str = "",
+    column: str = "",
+    values: str = "",
+    H2O: float = 0,
+    O2: float = 0,
+    SO2: float = 0,
+    NO2: float = 0,
+    H2S: float = 0,
+    H2SO4: float = 0,
+    HNO3: float = 0,
+    NO: float = 0,
+    HNO2: float = 0,
+    S8: float = 0,
+):
+
+    constituents = [column, row]
+
+    indices = [(i / 2) + 0.5 for i in range(20)]
+
+    result = pd.DataFrame(
+        itertools.product(indices, repeat=len(constituents)), columns=constituents
+    )
+    if "H2O" not in [row, column]:
+        result["H2O"] = H2O
+    if "O2" not in [row, column]:
+        result["O2"] = O2
+    if "SO2" not in [row, column]:
+        result["SO2"] = SO2
+    if "NO2" not in [row, column]:
+        result["NO2"] = NO2
+    if "H2S" not in [row, column]:
+        result["H2S"] = H2S
+
+    result = result.apply(wrap_runmodel, axis=1)
+    # Specify size for the final figure here
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    # The index parameter is used as the "vertical" axis, while the column parameter is the "horizontal" axis
+    plot_df = result.pivot_table(index=row, columns=column, values=values)
+    sns.heatmap(plot_df, annot=True, ax=ax, cmap="YlOrBr")
+    # Save the Seaborn plot to a BytesIO object
+    img = BytesIO()
+    plt.savefig(img, format="png")
+    plt.close()
+    img.seek(0)
+    return StreamingResponse(img, media_type="image/png")
+
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=5005)

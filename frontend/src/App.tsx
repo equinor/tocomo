@@ -1,5 +1,6 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
 import './App.css';
+import Dropdown from './DropdownComponent';
 
 interface InputChemicalValues {
   H2O: number;
@@ -53,6 +54,11 @@ function App() {
   const [input, setInput] = useState<InputChemicalValues>(defaultInputValues);
   const [output, setOutput] = useState<OutputChemicalValues>(defaultOutputValues);
 
+  const [row, setRow] = useState("");
+  const [column, setColumn] = useState("");
+
+  const [matrix_url, setMatrix_url] = useState("");
+
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setInput(prevValues => ({
@@ -64,6 +70,7 @@ function App() {
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();  // Prevent the form from submitting traditionally
     const queryParams = new URLSearchParams(Object.entries(input) as [string, string][]).toString();
+    setMatrix_url(`${baseURL}/api/run_matrix?row=${row}&column=${column}&values=H2SO4&${queryParams}`);
     const url = `${baseURL}/api/run_reactions?${queryParams}`;
     fetch(url)
       .then(response => response.json())
@@ -71,26 +78,50 @@ function App() {
       .catch(error => console.error('Error fetching data:', error)); // Handle any errors
   };
 
+  const handleRowSelect = (value: string) => {
+    setRow(value)
+  };
+
+  const handleColumnSelect = (value: string) => {
+    setColumn(value)
+  };
+
+  const options = Object.keys(defaultInputValues).map(key => ({
+    value: key,
+    label: key,
+  }));
   return (
     <>
       <h1>CO2 spec demo</h1>
+      <Dropdown
+        label="column parameter"
+        options={options}
+        placeholder="Select an option"
+        onSelect={handleColumnSelect}
+      />
+      <Dropdown
+        label="row parameter"
+        options={options}
+        placeholder="Select an option"
+        onSelect={handleRowSelect}
+      />
       <form onSubmit={handleSubmit}>
         <table className="input-table">
           <tbody>
-        {Object.entries(input).map(([key, value]) => (
+            {Object.entries(input).map(([key, value]) => (
               <tr key={key}>
                 <td><label htmlFor={key}>{key}</label></td>
                 <td>
-              <input
-                type="number"
+                  <input
+                    type="number"
                     id={key}
-                name={key}
-                value={value}
-                onChange={handleInputChange}
-              />
+                    name={key}
+                    value={value}
+                    onChange={handleInputChange}
+                  />
                 </td>
               </tr>
-        ))}
+            ))}
           </tbody>
         </table>
         <button type="submit">Run Reactions</button>
@@ -100,17 +131,17 @@ function App() {
           <h2>Results:</h2>
           <table className="results-table">
             <tbody>
-          {Object.entries(output).map(([key, value], index) => (
+              {Object.entries(output).map(([key, value], index) => (
                 <tr key={index}>
                   <td>{key}</td>
                   <td>{value.toFixed(2)}</td>
                 </tr>
-          ))}
+              ))}
             </tbody>
           </table>
         </div>
       )}
-
+      <img src={matrix_url} alt="Seaborn Plot" />
       <div>
         <h2>Notes:</h2>
         <pre className="notes">
@@ -137,7 +168,7 @@ loop until no more reactions possible:
 show concentrations when no more reactions possible
 `}
         </pre>
-      </div>   
+      </div>
     </>
   );
 }

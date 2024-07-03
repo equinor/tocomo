@@ -5,6 +5,7 @@ COPY . app
 RUN pip install fastapi
 RUN pip install uvicorn
 RUN pip install fastapi[all]
+RUN pip install pandas matplotlib seaborn
 
 WORKDIR /app
 
