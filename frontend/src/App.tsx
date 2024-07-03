@@ -146,19 +146,19 @@ function App() {
     <>
       <h1>CO2 spec demo</h1>
       <Dropdown
-        label="column parameter"
+        label="Column parameter"
         options={options}
         placeholder="Select an option"
         onSelect={handleColumnSelect}
       />
       <Dropdown
-        label="row parameter"
+        label="Row parameter"
         options={options}
         placeholder="Select an option"
         onSelect={handleRowSelect}
       />
       <Dropdown
-        label="Value Parameter"
+        label="Value parameter"
         options={outputoptions}
         placeholder="Select an option"
         onSelect={handleValuenameSelect}
@@ -184,22 +184,7 @@ function App() {
         </table>
         <button type="submit">Run Reactions</button>
       </form>
-      {output && (
-        <div>
-          <h2>Results:</h2>
-          <table className="results-table">
-            <tbody>
-              {Object.entries(output).map(([key, value], index) => (
-                <tr key={index}>
-                  <td>{key}</td>
-                  <td>{value.toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-      <img src={matrix_url} alt="Seaborn Plot" />
+      {output && (<img src={matrix_url} alt="Seaborn Plot" />)}
       <button onClick={() => downloadCSV(csv_url, 'export.csv')}>
         Download CSV
       </button>
