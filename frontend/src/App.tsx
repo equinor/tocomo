@@ -56,6 +56,7 @@ function App() {
 
   const [row, setRow] = useState("");
   const [column, setColumn] = useState("");
+  const [valuename, setValuename] = useState("");
 
   const [matrix_url, setMatrix_url] = useState("");
 
@@ -70,7 +71,7 @@ function App() {
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();  // Prevent the form from submitting traditionally
     const queryParams = new URLSearchParams(Object.entries(input) as [string, string][]).toString();
-    setMatrix_url(`${baseURL}/api/run_matrix?row=${row}&column=${column}&values=H2SO4&${queryParams}`);
+    setMatrix_url(`${baseURL}/api/run_matrix?row=${row}&column=${column}&values=${valuename}&${queryParams}`);
     const url = `${baseURL}/api/run_reactions?${queryParams}`;
     fetch(url)
       .then(response => response.json())
@@ -86,7 +87,15 @@ function App() {
     setColumn(value)
   };
 
+  const handleValuenameSelect = (value: string) => {
+    setValuename(value)
+  };
+
   const options = Object.keys(defaultInputValues).map(key => ({
+    value: key,
+    label: key,
+  }));
+  const outputoptions = Object.keys(defaultOutputValues).map(key => ({
     value: key,
     label: key,
   }));
@@ -104,6 +113,12 @@ function App() {
         options={options}
         placeholder="Select an option"
         onSelect={handleRowSelect}
+      />
+      <Dropdown
+        label="Value Parameter"
+        options={outputoptions}
+        placeholder="Select an option"
+        onSelect={handleValuenameSelect}
       />
       <form onSubmit={handleSubmit}>
         <table className="input-table">
