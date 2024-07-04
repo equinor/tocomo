@@ -104,32 +104,32 @@ function App() {
 
   async function downloadCSV(endpoint: string, filename: string) {
     try {
-        const response = await fetch(endpoint, {
-            method: 'GET',
-            headers: {
-                // Add any required headers here
-            }
-        });
-
-        if (response.status === 200) {
-            // Retrieve the CSV from the response
-            const blob = await response.blob();
-
-            // Create a link and trigger the download
-            const downloadUrl = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.setAttribute('download', filename); // Any filename you want to give it
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-        } else {
-            console.error('Error fetching CSV:', response.status);
-            // You may want to handle any errors, e.g., showing an alert to the user
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          // Add any required headers here
         }
+      });
+
+      if (response.status === 200) {
+        // Retrieve the CSV from the response
+        const blob = await response.blob();
+
+        // Create a link and trigger the download
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.setAttribute('download', filename); // Any filename you want to give it
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      } else {
+        console.error('Error fetching CSV:', response.status);
+        // You may want to handle any errors, e.g., showing an alert to the user
+      }
     } catch (error) {
-        console.error('Error downloading CSV:', error);
-        // Handle the error
+      console.error('Error downloading CSV:', error);
+      // Handle the error
     }
   }
 
