@@ -113,7 +113,16 @@ function App() {
 
       if (response.status === 200) {
         // Retrieve the CSV from the response
-        const blob = await response.blob();
+        let csvText = await response.text();
+
+        // Remove the enclosing double quotes
+        csvText = csvText.replace(/^"|"$/g, '');
+
+        // Replace escaped newlines with actual newline characters
+        csvText = csvText.replace(/\\n/g, '\n');
+
+        // Convert the CSV text to a Blob with a MIME type of 'text/csv'
+        const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
 
         // Create a link and trigger the download
         const downloadUrl = window.URL.createObjectURL(blob);
