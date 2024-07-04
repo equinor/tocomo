@@ -240,6 +240,11 @@ async def run_matrix(
     fig, ax = plt.subplots(figsize=(12, 7))
 
     sns.heatmap(plot_df, annot=True, ax=ax, cmap="YlOrBr")
+    ax.xaxis.tick_top()
+    ax.xaxis.set_label_position('top')
+
+    ax.set_yticklabels(ax.get_yticklabels(), rotation=0)
+
     # Save the Seaborn plot to a BytesIO object
     img = BytesIO()
     plt.savefig(img, format="png")
