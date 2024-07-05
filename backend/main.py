@@ -247,10 +247,10 @@ async def run_matrix(
 
     # Save the Seaborn plot to a BytesIO object
     img = BytesIO()
-    plt.savefig(img, format="png")
+    plt.savefig(img, format="svg")
     plt.close()
     img.seek(0)
-    return StreamingResponse(img, media_type="image/png")
+    return StreamingResponse(img, media_type="image/svg+xml")
 
 
 if __name__ == "__main__":
