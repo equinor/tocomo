@@ -1,7 +1,6 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
 import './App.css';
-import Dropdown from './DropdownComponent';
-
+import { Autocomplete } from '@equinor/eds-core-react';
 
 interface InputChemicalValues {
   H2O: number;
@@ -142,35 +141,32 @@ function App() {
     }
   }
 
-
-  const options = Object.keys(defaultInputValues).map(key => ({
-    value: key,
-    label: key,
-  }));
-  const outputoptions = Object.keys(defaultOutputValues).map(key => ({
-    value: key,
-    label: key,
-  }));
+  const inputKeys: string[] = Object.keys(defaultInputValues);
+  const outputKeys: string[] = Object.keys(defaultOutputValues);
+  
   return (
     <>
       <h1>CO2 spec demo</h1>
-      <Dropdown
+      <Autocomplete
         label="Column parameter"
-        options={options}
-        placeholder="Select an option"
-        onSelect={handleColumnSelect}
+        options={inputKeys}
+        onInputChange={handleColumnSelect}
+        hideClearButton={true}
+        autoWidth={true}
       />
-      <Dropdown
+      <Autocomplete
         label="Row parameter"
-        options={options}
-        placeholder="Select an option"
-        onSelect={handleRowSelect}
+        options={inputKeys}
+        onInputChange={handleRowSelect}
+        hideClearButton={true}
+        autoWidth={true}
       />
-      <Dropdown
+      <Autocomplete
         label="Value parameter"
-        options={outputoptions}
-        placeholder="Select an option"
-        onSelect={handleValuenameSelect}
+        options={outputKeys}
+        onInputChange={handleValuenameSelect}
+        hideClearButton={true}
+        autoWidth={true}
       />
       <form onSubmit={handleSubmit}>
         <table className="input-table">
