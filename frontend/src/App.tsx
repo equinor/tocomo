@@ -1,6 +1,6 @@
-import { useState, FormEvent, ChangeEvent } from 'react';
+import { useState, ChangeEvent } from 'react';
 import './App.css';
-import { Autocomplete } from '@equinor/eds-core-react';
+import { Autocomplete, Input, Label, Button } from '@equinor/eds-core-react';
 
 interface InputChemicalValues {
   H2O: number;
@@ -77,8 +77,7 @@ function App() {
     }));
   };
 
-  const handleSubmit = (event: FormEvent) => {
-    event.preventDefault();  // Prevent the form from submitting traditionally
+  const handleSubmit = () => {
     const queryParams = new URLSearchParams(Object.entries(input) as [string, string][]).toString();
     setMatrix_url(`${baseURL}/api/run_matrix?row=${row}&column=${column}&values=${valuename}&${queryParams}`);
     setCSV_url(`${baseURL}/api/export_csv?row=${row}&column=${column}&values=${valuename}&${queryParams}`);
@@ -168,27 +167,20 @@ function App() {
         hideClearButton={true}
         autoWidth={true}
       />
-      <form onSubmit={handleSubmit}>
-        <table className="input-table">
-          <tbody>
-            {Object.entries(input).map(([key, value]) => (
-              <tr key={key}>
-                <td><label htmlFor={key}>{key}</label></td>
-                <td>
-                  <input
-                    type="number"
-                    id={key}
-                    name={key}
-                    value={value}
-                    onChange={handleInputChange}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <button type="submit">Run Reactions</button>
-      </form>
+      {Object.entries(input).map(([key, value]) => (
+        <div style={{
+            margin: '16px 0'
+        }}>
+            <Label htmlFor={key} label={key} />
+            <Input
+                id={key}
+                name={key}
+                value={value}
+                onChange={handleInputChange}
+            />
+        </div>
+      ))}
+      <Button onClick={handleSubmit}>Run Reactions</Button>
       {output && (<img src={matrix_url} alt="Seaborn Plot" />)}
       <button onClick={() => downloadCSV(csv_url, 'export.csv')}>
         Download CSV
