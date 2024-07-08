@@ -14,11 +14,11 @@ interface InputChemicalValues {
 }
 
 const defaultInputValues: InputChemicalValues = {
-  H2O: 40,
+  H2O: 30,
   O2: 30,
-  SO2: 0,
+  SO2: 10,
   NO2: 20,
-  H2S: 10,
+  H2S: 0,
   inner_diameter: 30,
   drop_out_length: 1000,
   flowrate: 20,
