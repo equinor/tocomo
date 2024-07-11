@@ -146,45 +146,52 @@ function App() {
   return (
     <>
       <h1>CO2 spec demo</h1>
-      <Autocomplete
-        label="Column parameter"
-        options={inputKeys}
-        onInputChange={handleColumnSelect}
-        hideClearButton={true}
-        autoWidth={true}
-      />
-      <Autocomplete
-        label="Row parameter"
-        options={inputKeys}
-        onInputChange={handleRowSelect}
-        hideClearButton={true}
-        autoWidth={true}
-      />
-      <Autocomplete
-        label="Value parameter"
-        options={outputKeys}
-        onInputChange={handleValuenameSelect}
-        hideClearButton={true}
-        autoWidth={true}
-      />
-      {Object.entries(input).map(([key, value]) => (
-        <div style={{
-            margin: '16px 0'
-        }}>
-            <Label htmlFor={key} label={key} />
-            <Input
-                id={key}
-                name={key}
-                value={value}
-                onChange={handleInputChange}
-            />
+      <div className='container'>
+        <div className='container2'>
+        {Object.entries(input).map(([key, value]) => (
+            <div>
+                <Label htmlFor={key} label={key} />
+                <Input
+                    id={key}
+                    name={key}
+                    value={value}
+                    onChange={handleInputChange}
+                />
+            </div>
+        ))}
         </div>
-      ))}
+        <div className='container2'>
+            <div>
+                <Autocomplete
+                    label="Column parameter"
+                    options={inputKeys}
+                    onInputChange={handleColumnSelect}
+                    hideClearButton={true}
+                />
+            </div>
+            <div>
+                <Autocomplete
+                    label="Row parameter"
+                    options={inputKeys}
+                    onInputChange={handleRowSelect}
+                    hideClearButton={true}
+                />
+            </div>
+            <div>
+                <Autocomplete
+                    label="Value parameter"
+                    options={outputKeys}
+                    onInputChange={handleValuenameSelect}
+                    hideClearButton={true}
+                />
+            </div>
+        </div>
+      </div>
       <Button onClick={handleSubmit}>Run Reactions</Button>
       {output && matrix_url && (<img src={matrix_url} alt="Seaborn Plot" />)}
       {csv_url && <button onClick={() => downloadCSV(csv_url, 'export.csv')}>
         Download CSV
-      </button>
+      </button>}
       <div>
         <h2>Notes:</h2>
         <pre className="notes">

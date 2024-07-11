@@ -57,3 +57,19 @@
   white-space: pre-wrap; /* Ensures that long lines are wrapped */
   font-family: monospace; /* Optional: Use monospace font for <pre> */
 }
+
+.container {
+  display: flex;
+  flex-direction: row; 
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.container2 {
+  display: flex;
+  flex-direction: column; 
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin: 20px;
+}
