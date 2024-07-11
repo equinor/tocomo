@@ -181,8 +181,8 @@ function App() {
         </div>
       ))}
       <Button onClick={handleSubmit}>Run Reactions</Button>
-      {output && (<img src={matrix_url} alt="Seaborn Plot" />)}
-      <button onClick={() => downloadCSV(csv_url, 'export.csv')}>
+      {output && matrix_url && (<img src={matrix_url} alt="Seaborn Plot" />)}
+      {csv_url && <button onClick={() => downloadCSV(csv_url, 'export.csv')}>
         Download CSV
       </button>
       <div>
