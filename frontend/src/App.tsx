@@ -8,9 +8,6 @@ interface InputChemicalValues {
   SO2: number;
   NO2: number;
   H2S: number;
-  inner_diameter: number;
-  drop_out_length: number;
-  flowrate: number;
 }
 
 const defaultInputValues: InputChemicalValues = {
@@ -19,10 +16,19 @@ const defaultInputValues: InputChemicalValues = {
   SO2: 10,
   NO2: 20,
   H2S: 0,
+};
+
+interface InputPipeTransport{
+  inner_diameter: number;
+  drop_out_length: number;
+  flowrate: number;
+}
+
+const defaultPipeTransportValues: InputPipeTransport = {
   inner_diameter: 30,
   drop_out_length: 1000,
   flowrate: 20,
-};
+}
 
 interface OutputChemicalValues {
   H2O: number;
@@ -69,6 +75,9 @@ function App() {
   const [matrix_url, setMatrix_url] = useState("");
   const [csv_url, setCSV_url] = useState("");
 
+  const [inputPipeTransport, setInputPipeTransport] = useState<InputPipeTransport>(defaultPipeTransportValues);
+  const [showPipeInput, setShowPipeInput] = useState(false);
+
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setInput(prevValues => ({
@@ -77,9 +86,18 @@ function App() {
     }));
   };
 
+  const handleCorrosionInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    setInputPipeTransport(prevValues => ({
+      ...prevValues,
+      [name]: parseFloat(value) || 0,
+    }));
+  };
+
   const handleSubmit = () => {
     const queryParams = new URLSearchParams(Object.entries(input) as [string, string][]).toString();
-    setMatrix_url(`${baseURL}/api/run_matrix?row=${row}&column=${column}&values=${valuename}&${queryParams}`);
+    const corrosionParams = new URLSearchParams(Object.entries(inputPipeTransport) as [string, string][]).toString();
+    setMatrix_url(`${baseURL}/api/run_matrix?row=${row}&column=${column}&values=${valuename}&${queryParams}&${corrosionParams}`);
     setCSV_url(`${baseURL}/api/export_csv?row=${row}&column=${column}&values=${valuename}&${queryParams}`);
     const url = `${baseURL}/api/run_reactions?${queryParams}`;
     fetch(url)
@@ -97,7 +115,8 @@ function App() {
   };
 
   const handleValuenameSelect = (value: string) => {
-    setValuename(value)
+    setValuename(value);
+    setShowPipeInput(value === 'H2SO4_corrision' || value === 'HNO3_corrosion' || value === 'corrosion_rate');
   };
 
   async function downloadCSV(endpoint: string, filename: string) {
@@ -181,11 +200,27 @@ function App() {
                 <Autocomplete
                     label="Value parameter"
                     options={outputKeys}
-                    onInputChange={handleValuenameSelect}
+                    onInputChange={(selected_item: string) => {
+                      return handleValuenameSelect(selected_item);
+                    }}
                     hideClearButton={true}
                 />
             </div>
         </div>
+        {showPipeInput &&
+        <div className='container2'>
+          {Object.entries(inputPipeTransport).map(([key, value]) => (
+              <div>
+                  <Label htmlFor={key} label={key} />
+                  <Input
+                      id={key}
+                      name={key}
+                      value={value}
+                      onChange={handleCorrosionInputChange}
+                  />
+              </div>
+          ))}
+        </div>}
       </div>
       <Button onClick={handleSubmit}>Run Reactions</Button>
       {output && matrix_url && (<img src={matrix_url} alt="Seaborn Plot" />)}
