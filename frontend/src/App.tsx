@@ -98,7 +98,7 @@ function App() {
     const queryParams = new URLSearchParams(Object.entries(input) as [string, string][]).toString();
     const corrosionParams = new URLSearchParams(Object.entries(inputPipeTransport) as [string, string][]).toString();
     setMatrix_url(`${baseURL}/api/run_matrix?row=${row}&column=${column}&values=${valuename}&${queryParams}&${corrosionParams}`);
-    setCSV_url(`${baseURL}/api/export_csv?row=${row}&column=${column}&values=${valuename}&${queryParams}`);
+    setCSV_url(`${baseURL}/api/export_csv?row=${row}&column=${column}&values=${valuename}&${queryParams}&${corrosionParams}`);
     const url = `${baseURL}/api/run_reactions?${queryParams}`;
     fetch(url)
       .then(response => response.json())
@@ -224,9 +224,9 @@ function App() {
       </div>
       <Button onClick={handleSubmit}>Run Reactions</Button>
       {output && matrix_url && (<img src={matrix_url} alt="Seaborn Plot" />)}
-      {csv_url && <button onClick={() => downloadCSV(csv_url, 'export.csv')}>
+      {csv_url && <Button onClick={() => downloadCSV(csv_url, 'export.csv')}>
         Download CSV
-      </button>}
+      </Button>}
       <div>
         <h2>Notes:</h2>
         <pre className="notes">
