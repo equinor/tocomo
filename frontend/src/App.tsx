@@ -21,15 +21,15 @@ const defaultInputValues: InputChemicalValues = {
 };
 
 interface InputPipeTransport{
-  inner_diameter: number;
-  drop_out_length: number;
-  flowrate: number;
+  innerDiameter: number;
+  dropOutLength: number;
+  flowRate: number;
 }
 
 const defaultPipeTransportValues: InputPipeTransport = {
-  inner_diameter: 30,
-  drop_out_length: 1000,
-  flowrate: 20,
+  innerDiameter: 30,
+  dropOutLength: 1000,
+  flowRate: 20,
 }
 
 interface OutputChemicalValues {
@@ -43,9 +43,9 @@ interface OutputChemicalValues {
   NO: number;
   HNO2: number;
   S8: number;
-  HNO3_corrosion: number,
-  H2SO4_corrision: number,
-  corrosion_rate: number,
+  HNO3corrosion: number,
+  H2SO4corrosion: number,
+  corrosionRate: number,
 }
 
 const defaultOutputValues: OutputChemicalValues = {
@@ -59,9 +59,9 @@ const defaultOutputValues: OutputChemicalValues = {
   NO: 0,
   HNO2: 0,
   S8: 0,
-  HNO3_corrosion: 0,
-  H2SO4_corrision: 0,
-  corrosion_rate: 0,
+  HNO3corrosion: 0,
+  H2SO4corrosion: 0,
+  corrosionRate: 0,
 };
 
 function App() {
@@ -116,7 +116,7 @@ function App() {
 
   const handleValuenameSelect = (value: string) => {
     setValuename(value);
-    setShowPipeInput(value === 'H2SO4_corrision' || value === 'HNO3_corrosion' || value === 'corrosion_rate');
+    setShowPipeInput(value === 'H2SO4corrosion' || value === 'HNO3corrosion' || value === 'corrosionRate');
   };
 
   async function downloadCSV(endpoint: string, filename: string) {

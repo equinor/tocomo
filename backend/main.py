@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 import itertools
 import pandas as pd
 from reactions import run_model_sm1, parse_reaction_string
@@ -173,9 +173,9 @@ async def export_csv(
     NO: float = 0,
     HNO2: float = 0,
     S8: float = 0,
-    inner_diameter: float = 0,
-    drop_out_length: float = 0,
-    flowrate: float = 0,
+    inner_diameter: float = Query(default=0, alias="innerDiameter"),
+    drop_out_length: float = Query(default=0, alias="dropOutLength"),
+    flowrate: float = Query(default=0, alias="flowRate"),
 ):
     plot_df = constract_df(
         row,
@@ -213,9 +213,9 @@ async def run_matrix(
     NO: float = 0,
     HNO2: float = 0,
     S8: float = 0,
-    inner_diameter: float = 0,
-    drop_out_length: float = 0,
-    flowrate: float = 0,
+    inner_diameter: float = Query(default=0, alias="innerDiameter"),
+    drop_out_length: float = Query(default=0, alias="dropOutLength"),
+    flowrate: float = Query(default=0, alias="flowRate"),
 ):
     plot_df = constract_df(
         row,
