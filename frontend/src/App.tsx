@@ -2,6 +2,8 @@ import { useState, ChangeEvent } from 'react';
 import './App.css';
 import { Autocomplete, Input, Label, Button } from '@equinor/eds-core-react';
 
+const baseUrl = import.meta.env.VITE_BACKEND_BASEURL || "/";
+
 interface InputChemicalValues {
   H2O: number;
   O2: number;
@@ -62,8 +64,6 @@ const defaultOutputValues: OutputChemicalValues = {
   corrosion_rate: 0,
 };
 
-const baseURL: string = ""
-
 function App() {
   const [input, setInput] = useState<InputChemicalValues>(defaultInputValues);
   const [output, setOutput] = useState<OutputChemicalValues>(defaultOutputValues);
@@ -97,9 +97,9 @@ function App() {
   const handleSubmit = () => {
     const queryParams = new URLSearchParams(Object.entries(input) as [string, string][]).toString();
     const corrosionParams = new URLSearchParams(Object.entries(inputPipeTransport) as [string, string][]).toString();
-    setMatrix_url(`${baseURL}/api/run_matrix?row=${row}&column=${column}&values=${valuename}&${queryParams}&${corrosionParams}`);
-    setCSV_url(`${baseURL}/api/export_csv?row=${row}&column=${column}&values=${valuename}&${queryParams}&${corrosionParams}`);
-    const url = `${baseURL}/api/run_reactions?${queryParams}`;
+    setMatrix_url(`${baseUrl}api/run_matrix?row=${row}&column=${column}&values=${valuename}&${queryParams}&${corrosionParams}`);
+    setCSV_url(`${baseUrl}api/export_csv?row=${row}&column=${column}&values=${valuename}&${queryParams}&${corrosionParams}`);
+    const url = `${baseUrl}api/run_reactions?${queryParams}`;
     fetch(url)
       .then(response => response.json())
       .then(data => setOutput(data))

@@ -12,3 +12,12 @@ logs
 
 node_modules
 bower_components
+# Devenv
+.devenv*
+devenv.local.nix
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
