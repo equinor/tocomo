@@ -6,15 +6,13 @@
   ...
 }:
 
-let
-
-  backendBaseUrl = "http://localhost:5005/";
-in
 {
-  env.VITE_BACKEND_BASEURL = backendBaseUrl;
+  env.VITE_BACKEND_BASEURL = "http://localhost:5005/";
 
   languages.python = {
+    directory = "./backend";
     enable = true;
+
     venv.enable = true;
     venv.requirements = ''
       fastapi[all]
@@ -26,9 +24,11 @@ in
   };
 
   languages.javascript = {
+    directory = "./frontend";
     enable = true;
+
     npm.enable = true;
-    directory = ./frontend;
+    npm.install.enable = true;
   };
 
   processes.backend.exec = ''
@@ -45,8 +45,4 @@ in
     nixfmt.enable = true;
     nixfmt.package = pkgs.nixfmt-rfc-style;
   };
-
-  enterShell = ''
-    # echo "BACKEND_BASEURL=${backendBaseUrl}" > ${config.devenv.root}/frontend/.env
-  '';
 }

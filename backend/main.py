@@ -1,7 +1,11 @@
+from __future__ import annotations
+from typing import Any, TypedDict
+
 from fastapi import FastAPI
+from pydantic import BaseModel
 import itertools
 import pandas as pd
-from reactions import run_model_sm1, parse_reaction_string
+from reactions import run_model_sm1
 from corrosion_calc import surface_area, corrosion_rate_HNO3, corrosion_rate_H2SO4
 from fastapi.middleware.cors import CORSMiddleware
 import seaborn as sns
@@ -20,8 +24,36 @@ origins = [
 ]
 
 
+class DefaultComponents(BaseModel):
+    inputs: dict[str, float]
+    outputs: list[str]
+
+
+COMPOUNDS = DefaultComponents(
+    inputs={
+        "H2O": 30.0,
+        "O2": 30.0,
+        "SO2": 10.0,
+        "NO2": 20.0,
+        "H2S": 0.0,
+    },
+    outputs=[
+        "H2SO4",
+        "HNO3",
+        "NO",
+        "HNO2",
+        "S8",
+    ],
+)
+
+
+@app.get("/api/compounds")
+async def get_compounds() -> DefaultComponents:
+    return COMPOUNDS
+
+
 @app.get("/api/hello")
-async def hello():
+async def hello() -> Any:
     return {"message": "Hello from backend"}
 
 
@@ -37,46 +69,10 @@ app.add_middleware(
 
 @app.get("/api/run_reactions")
 async def run_reactions(
-    H2O: float = 0,
-    O2: float = 0,
-    SO2: float = 0,
-    NO2: float = 0,
-    H2S: float = 0,
-    H2SO4: float = 0,
-    HNO3: float = 0,
-    NO: float = 0,
-    HNO2: float = 0,
-    S8: float = 0,
-):
-    concentrations = {
-        "H2O": H2O,
-        "O2": O2,
-        "SO2": SO2,
-        "NO2": NO2,
-        "H2S": H2S,
-        "H2SO4": H2SO4,
-        "HNO3": HNO3,
-        "NO": NO,
-        "HNO2": HNO2,
-        "S8": S8,
-    }
+    concentrations: dict[str, float],
+) -> dict[str, float]:
     run_model_sm1(concentrations, verbose=False)
-
     return concentrations
-
-
-CHEMICALS = [
-    "H2O",
-    "O2",
-    "SO2",
-    "NO2",
-    "H2S",
-    "H2SO4",
-    "HNO3",
-    "NO",
-    "HNO2",
-    "S8",
-]
 
 
 # This is a helper function we use to apply over our data frame. Should not be edited
@@ -108,47 +104,24 @@ def wrap_corrosion_calc(argument):
     return argument
 
 
-def constract_df(
-    row,
-    column,
+def construct_df(
+    row: str,
+    column: str,
     values,
-    H2O,
-    O2,
-    SO2,
-    NO2,
-    H2S,
-    H2SO4,
-    HNO3,
-    NO,
-    HNO2,
-    S8,
-    inner_diameter,
-    drop_out_length,
-    flowrate,
+    concentrations: dict[str, float],
+    parameters: dict[str, float],
 ):
-    constituents = [column, row]
-
+    axes = [column, row]
     indices = [(i / 2) + 0.5 for i in range(20)]
 
     result = pd.DataFrame(
-        itertools.product(indices, repeat=len(constituents)), columns=constituents
+        itertools.product(indices, repeat=len(axes)), columns=axes
     )
-    if "H2O" not in [row, column]:
-        result["H2O"] = H2O
-    if "O2" not in [row, column]:
-        result["O2"] = O2
-    if "SO2" not in [row, column]:
-        result["SO2"] = SO2
-    if "NO2" not in [row, column]:
-        result["NO2"] = NO2
-    if "H2S" not in [row, column]:
-        result["H2S"] = H2S
-    if "inner_diameter" not in [row, column]:
-        result["inner_diameter"] = inner_diameter
-    if "drop_out_length" not in [row, column]:
-        result["drop_out_length"] = drop_out_length
-    if "flowrate" not in [row, column]:
-        result["flowrate"] = flowrate
+
+    for key, val in {**concentrations, **parameters}.items():
+        if key in axes:
+            continue
+        result[key] = val
 
     result = result.apply(wrap_runmodel, axis=1)
     result = result.apply(wrap_corrosion_calc, axis=1)
@@ -160,80 +133,36 @@ def constract_df(
 
 @app.get("/api/export_csv")
 async def export_csv(
-    row: str = "",
-    column: str = "",
-    values: str = "",
-    H2O: float = 0,
-    O2: float = 0,
-    SO2: float = 0,
-    NO2: float = 0,
-    H2S: float = 0,
-    H2SO4: float = 0,
-    HNO3: float = 0,
-    NO: float = 0,
-    HNO2: float = 0,
-    S8: float = 0,
-    inner_diameter: float = 0,
-    drop_out_length: float = 0,
-    flowrate: float = 0,
+    row: str,
+    column: str,
+    values: str,
+    concentrations: dict[str, float],
+    parameters: dict[str, float],
 ):
-    plot_df = constract_df(
+    plot_df = construct_df(
         row,
         column,
         values,
-        H2O,
-        O2,
-        SO2,
-        NO2,
-        H2S,
-        H2SO4,
-        HNO3,
-        NO,
-        HNO2,
-        S8,
-        inner_diameter,
-        drop_out_length,
-        flowrate,
+        concentrations,
+        parameters,
     )
     return plot_df.to_csv()
 
 
 @app.get("/api/run_matrix")
 async def run_matrix(
-    row: str = "",
-    column: str = "",
-    values: str = "",
-    H2O: float = 0,
-    O2: float = 0,
-    SO2: float = 0,
-    NO2: float = 0,
-    H2S: float = 0,
-    H2SO4: float = 0,
-    HNO3: float = 0,
-    NO: float = 0,
-    HNO2: float = 0,
-    S8: float = 0,
-    inner_diameter: float = 0,
-    drop_out_length: float = 0,
-    flowrate: float = 0,
+    row: str,
+    column: str,
+    values: str,
+    concentrations: dict[str, float],
+    parameters: dict[str, float],
 ):
-    plot_df = constract_df(
+    plot_df = construct_df(
         row,
         column,
         values,
-        H2O,
-        O2,
-        SO2,
-        NO2,
-        H2S,
-        H2SO4,
-        HNO3,
-        NO,
-        HNO2,
-        S8,
-        inner_diameter,
-        drop_out_length,
-        flowrate,
+        concentrations,
+        parameters,
     )
 
     # Specify size for the final figure here
