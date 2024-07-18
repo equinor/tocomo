@@ -1,259 +1,52 @@
-import { useState, ChangeEvent } from 'react';
-import './App.css';
-import { Autocomplete, Input, Label, Button } from '@equinor/eds-core-react';
+import { useState, useEffect } from "react";
 
-const baseUrl = import.meta.env.VITE_BACKEND_BASEURL || "/";
+import "./App.css";
+import { Form } from "./Form";
+import { Output } from "./Output";
+import { baseUrl } from "./util";
 
-interface InputChemicalValues {
-  H2O: number;
-  O2: number;
-  SO2: number;
-  NO2: number;
-  H2S: number;
+interface SubmitParams {
+  inputs: [string: number];
+  columnValue: string;
+  rowValue: string;
+  valueValue: string;
 }
-
-const defaultInputValues: InputChemicalValues = {
-  H2O: 30,
-  O2: 30,
-  SO2: 10,
-  NO2: 20,
-  H2S: 0,
-};
-
-interface InputPipeTransport{
-  inner_diameter: number;
-  drop_out_length: number;
-  flowrate: number;
-}
-
-const defaultPipeTransportValues: InputPipeTransport = {
-  inner_diameter: 30,
-  drop_out_length: 1000,
-  flowrate: 20,
-}
-
-interface OutputChemicalValues {
-  H2O: number;
-  O2: number;
-  SO2: number;
-  NO2: number;
-  H2S: number;
-  H2SO4: number;
-  HNO3: number;
-  NO: number;
-  HNO2: number;
-  S8: number;
-  HNO3_corrosion: number,
-  H2SO4_corrision: number,
-  corrosion_rate: number,
-}
-
-const defaultOutputValues: OutputChemicalValues = {
-  H2O: 0,
-  O2: 0,
-  SO2: 0,
-  NO2: 0,
-  H2S: 0,
-  H2SO4: 0,
-  HNO3: 0,
-  NO: 0,
-  HNO2: 0,
-  S8: 0,
-  HNO3_corrosion: 0,
-  H2SO4_corrision: 0,
-  corrosion_rate: 0,
-};
 
 function App() {
-  const [input, setInput] = useState<InputChemicalValues>(defaultInputValues);
-  const [output, setOutput] = useState<OutputChemicalValues>(defaultOutputValues);
+  const [defaults, setDefaults] = useState(null);
+  const [inputs, setInputs] = useState<SubmitParams | null>(null);
 
-  const [row, setRow] = useState("");
-  const [column, setColumn] = useState("");
-  const [valuename, setValuename] = useState("");
+  useEffect(() => {
+    let ignore = false;
 
-  const [matrix_url, setMatrix_url] = useState("");
-  const [csv_url, setCSV_url] = useState("");
+    if (defaults !== null) return;
 
-  const [inputPipeTransport, setInputPipeTransport] = useState<InputPipeTransport>(defaultPipeTransportValues);
-  const [showPipeInput, setShowPipeInput] = useState(false);
+    fetch(`${baseUrl}api/compounds`)
+      .then((resp) => resp.json())
+      .then((data) => {
+        if (!ignore) setDefaults(data);
+      })
+      .catch(console.error);
 
-  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setInput(prevValues => ({
-      ...prevValues,
-      [name]: parseFloat(value) || 0,
-    }));
-  };
+    return () => {
+      ignore = true;
+    };
+  }, [defaults]);
 
-  const handleCorrosionInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setInputPipeTransport(prevValues => ({
-      ...prevValues,
-      [name]: parseFloat(value) || 0,
-    }));
-  };
-
-  const handleSubmit = () => {
-    const queryParams = new URLSearchParams(Object.entries(input) as [string, string][]).toString();
-    const corrosionParams = new URLSearchParams(Object.entries(inputPipeTransport) as [string, string][]).toString();
-    setMatrix_url(`${baseUrl}api/run_matrix?row=${row}&column=${column}&values=${valuename}&${queryParams}&${corrosionParams}`);
-    setCSV_url(`${baseUrl}api/export_csv?row=${row}&column=${column}&values=${valuename}&${queryParams}&${corrosionParams}`);
-    const url = `${baseUrl}api/run_reactions?${queryParams}`;
-    fetch(url)
-      .then(response => response.json())
-      .then(data => setOutput(data))
-      .catch(error => console.error('Error fetching data:', error)); // Handle any errors
-  };
-
-  const handleRowSelect = (value: string) => {
-    setRow(value)
-  };
-
-  const handleColumnSelect = (value: string) => {
-    setColumn(value)
-  };
-
-  const handleValuenameSelect = (value: string) => {
-    setValuename(value);
-    setShowPipeInput(value === 'H2SO4_corrision' || value === 'HNO3_corrosion' || value === 'corrosion_rate');
-  };
-
-  async function downloadCSV(endpoint: string, filename: string) {
-    try {
-      const response = await fetch(endpoint, {
-        method: 'GET',
-        headers: {
-          // Add any required headers here
-        }
-      });
-
-      if (response.status === 200) {
-        // Retrieve the CSV from the response
-        let csvText = await response.text();
-
-        // Remove the enclosing double quotes
-        csvText = csvText.replace(/^"|"$/g, '');
-
-        // Replace escaped newlines with actual newline characters
-        csvText = csvText.replace(/\\n/g, '\n');
-
-        // Convert the CSV text to a Blob with a MIME type of 'text/csv'
-        const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
-
-        // Create a link and trigger the download
-        const downloadUrl = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.setAttribute('download', filename); // Any filename you want to give it
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-      } else {
-        console.error('Error fetching CSV:', response.status);
-        // You may want to handle any errors, e.g., showing an alert to the user
-      }
-    } catch (error) {
-      console.error('Error downloading CSV:', error);
-      // Handle the error
-    }
+  if (defaults === null) {
+    return (
+      <>
+        <h1>CO2 spec demo</h1>
+        <pre>Loading!</pre>
+      </>
+    );
   }
 
-  const inputKeys: string[] = Object.keys(defaultInputValues);
-  const outputKeys: string[] = Object.keys(defaultOutputValues);
-  
   return (
     <>
       <h1>CO2 spec demo</h1>
-      <div className='container'>
-        <div className='container2'>
-        {Object.entries(input).map(([key, value]) => (
-            <div>
-                <Label htmlFor={key} label={key} />
-                <Input
-                    id={key}
-                    name={key}
-                    value={value}
-                    onChange={handleInputChange}
-                />
-            </div>
-        ))}
-        </div>
-        <div className='container2'>
-            <div>
-                <Autocomplete
-                    label="Column parameter"
-                    options={inputKeys}
-                    onInputChange={handleColumnSelect}
-                    hideClearButton={true}
-                />
-            </div>
-            <div>
-                <Autocomplete
-                    label="Row parameter"
-                    options={inputKeys}
-                    onInputChange={handleRowSelect}
-                    hideClearButton={true}
-                />
-            </div>
-            <div>
-                <Autocomplete
-                    label="Value parameter"
-                    options={outputKeys}
-                    onInputChange={(selected_item: string) => {
-                      return handleValuenameSelect(selected_item);
-                    }}
-                    hideClearButton={true}
-                />
-            </div>
-        </div>
-        {showPipeInput &&
-        <div className='container2'>
-          {Object.entries(inputPipeTransport).map(([key, value]) => (
-              <div>
-                  <Label htmlFor={key} label={key} />
-                  <Input
-                      id={key}
-                      name={key}
-                      value={value}
-                      onChange={handleCorrosionInputChange}
-                  />
-              </div>
-          ))}
-        </div>}
-      </div>
-      <Button onClick={handleSubmit}>Run Reactions</Button>
-      {output && matrix_url && (<img src={matrix_url} alt="Seaborn Plot" />)}
-      {csv_url && <Button onClick={() => downloadCSV(csv_url, 'export.csv')}>
-        Download CSV
-      </Button>}
-      <div>
-        <h2>Notes:</h2>
-        <pre className="notes">
-          {`
-Pseudo algorithm of current implementation
-
-1: NO2 + SO2 + H2O -> NO + H2SO4
-2: 2 NO + O2 -> 2 NO2
-3: H2S + 3 NO2 -> SO2 + H2O + 3 NO
-4: 3 NO2 + H2O -> 2 HNO3 + NO
-5: 2 NO2 + H2O-> HNO3 + HNO2        # not used
-6: 8 H2S + 4 O2 -> 8 H2O + S8
-
-initial concentrations
-
-loop until no more reactions possible:
-  do      reaction 3 if possible
-  else do reaction 2 if possible
-  else do reaction 1 if possible
-  else do reaction 4 if possible
-  else do reaction 6 if possible
-  else stop the loop
-
-show concentrations when no more reactions possible
-`}
-        </pre>
-      </div>
+      <Form defaults={defaults} onSubmit={setInputs} />
+      <Output inputs={inputs} />
     </>
   );
 }

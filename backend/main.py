@@ -1,8 +1,8 @@
 from __future__ import annotations
-from typing import Any, TypedDict
+from typing import Any, TypedDict, Annotated
 
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, Body, Form
+from pydantic import BaseModel, Field
 import itertools
 import pandas as pd
 from reactions import run_model_sm1
@@ -15,7 +15,7 @@ from io import BytesIO
 
 from fastapi.responses import StreamingResponse
 
-app = FastAPI()
+app = FastAPI(debug=True)
 
 origins = [
     "http://localhost:3000",
@@ -27,6 +27,9 @@ origins = [
 class DefaultComponents(BaseModel):
     inputs: dict[str, float]
     outputs: list[str]
+    column: str
+    row: str
+    value: str
 
 
 COMPOUNDS = DefaultComponents(
@@ -44,6 +47,9 @@ COMPOUNDS = DefaultComponents(
         "HNO2",
         "S8",
     ],
+    column="O2",
+    row="NO2",
+    value="H2SO4",
 )
 
 
@@ -149,20 +155,49 @@ async def export_csv(
     return plot_df.to_csv()
 
 
+class RunMatrix(BaseModel):
+    row: str = Field(alias="rowValue")
+    column: str = Field(alias="columnValue")
+    value: str = Field(alias="valueValue")
+    inputs: dict[str, float]
+    parameters: dict[str, float] = Field(default_factory=dict)
+
+    model_config = {
+            "json_schema_extra": {
+                "examples": [
+                    {
+                        "inputs": {
+                            "H2O": 30,
+                            "O2": 30,
+                            "SO2": 10,
+                            "NO2": 20,
+                            "H2S": 0,
+                        },
+                        "columnValue": "O2",
+                        "rowValue": "NO2",
+                        "valueValue": "H2SO4",
+                    }
+                ]
+            }
+        }
+
+
 @app.get("/api/run_matrix")
 async def run_matrix(
-    row: str,
-    column: str,
-    values: str,
-    concentrations: dict[str, float],
-    parameters: dict[str, float],
+    q: str,
 ):
+    data = RunMatrix.model_validate_json(q)
+
     plot_df = construct_df(
-        row,
-        column,
-        values,
-        concentrations,
-        parameters,
+        data.row,
+        data.column,
+        data.value,
+        data.inputs,
+        {
+            "inner_diameter": 1.0,
+            "drop_out_length": 1.0,
+            "flowrate": 1.0,
+            },
     )
 
     # Specify size for the final figure here
@@ -174,7 +209,7 @@ async def run_matrix(
     ax.set_yticklabels(ax.get_yticklabels(), rotation=0)
 
     cbar = ax.collections[0].colorbar
-    cbar.ax.set_title(values, loc='center')
+    cbar.ax.set_title(data.value, loc='center')
 
     # Save the Seaborn plot to a BytesIO object
     img = BytesIO()

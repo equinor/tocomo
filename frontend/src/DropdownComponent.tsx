@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-
+import React, { useState } from "react";
 
 type Option = {
   value: string;
@@ -13,8 +12,13 @@ type DropdownProps = {
   onSelect: (value: string) => void;
 };
 
-const Dropdown: React.FC<DropdownProps> = ({ label, options, placeholder, onSelect }) => {
-  const [selectedValue, setSelectedValue] = useState<string>('');
+const Dropdown: React.FC<DropdownProps> = ({
+  label,
+  options,
+  placeholder,
+  onSelect,
+}) => {
+  const [selectedValue, setSelectedValue] = useState<string>("");
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
@@ -27,7 +31,7 @@ const Dropdown: React.FC<DropdownProps> = ({ label, options, placeholder, onSele
       <p>{label}</p>
       <select value={selectedValue} onChange={handleChange}>
         {placeholder && <option value="">{placeholder}</option>}
-        {options.map(option => (
+        {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>

@@ -9,6 +9,14 @@
 {
   env.VITE_BACKEND_BASEURL = "http://localhost:5005/";
 
+  languages.javascript = {
+    directory = "./frontend";
+    enable = true;
+
+    npm.enable = true;
+    npm.install.enable = true;
+  };
+
   languages.python = {
     directory = "./backend";
     enable = true;
@@ -21,14 +29,6 @@
       matplotlib
       seaborn
     '';
-  };
-
-  languages.javascript = {
-    directory = "./frontend";
-    enable = true;
-
-    npm.enable = true;
-    npm.install.enable = true;
   };
 
   processes.backend.exec = ''
