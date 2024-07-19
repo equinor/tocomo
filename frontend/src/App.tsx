@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 
-import "./App.css";
 import { Form, SubmitParams } from "./Form";
 import { Output } from "./Output";
 import { baseUrl } from "./util";
+import Container from "react-bootstrap/Container";
 
 function App() {
   const [defaults, setDefaults] = useState(null);
@@ -36,11 +36,11 @@ function App() {
   }
 
   return (
-    <>
-      <h1>CO2 spec demo</h1>
+    <Container>
+      <h1 className="text-center">CO2 spec demo</h1>
       <Form defaults={defaults} onSubmit={setInputs} />
       <Output inputs={inputs} />
-    </>
+    </Container>
   );
 }
 

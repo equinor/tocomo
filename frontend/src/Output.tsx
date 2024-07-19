@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import Plot from "react-plotly.js";
+import { TextField } from "@equinor/eds-core-react";
+
+import Row from "react-bootstrap/Row";
+import Form from "react-bootstrap/Form";
 
 import { baseUrl } from "./util";
 import { SubmitParams } from "./Form";
@@ -14,6 +18,7 @@ interface StateData {
     y: number[];
     z: number[][];
   };
+  logs: string;
 }
 
 function Output({ inputs }: OutputProps) {
@@ -35,6 +40,7 @@ function Output({ inputs }: OutputProps) {
   if (state === null) return;
 
   let layout: Partial<Plotly.Layout> = {
+    autosize: true,
     yaxis: {
       autorange: "reversed",
     },
@@ -62,7 +68,26 @@ function Output({ inputs }: OutputProps) {
     }
   }
 
-  return <Plot data={[{ ...state.plot, type: "heatmap" }]} layout={layout} />;
+  return (
+    <>
+      <Row>
+        <Plot data={[{ ...state.plot, type: "heatmap" }]} layout={layout} />
+      </Row>
+      <Row>
+        <Form.Group>
+          <Form.Label label="Computation logs" />
+          <Form.Control
+            as="textarea"
+            style={{ height: "24em" }}
+            readOnly
+            value={state.logs}
+            className="bg-dark text-light font-monospace"
+            wrap="off"
+          />
+        </Form.Group>
+      </Row>
+    </>
+  );
 }
 
 export { Output };

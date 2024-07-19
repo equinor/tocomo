@@ -1,5 +1,7 @@
 from __future__ import annotations
 from typing import Any, Annotated
+from io import StringIO
+from contextlib import redirect_stdout
 
 from fastapi import FastAPI, Request
 from pydantic import BaseModel, Field
@@ -8,12 +10,9 @@ import pandas as pd
 from reactions import run_model_sm1
 from corrosion_calc import surface_area, corrosion_rate_HNO3, corrosion_rate_H2SO4
 from fastapi.middleware.cors import CORSMiddleware
-import seaborn as sns
-import matplotlib.pyplot as plt
-from io import BytesIO
 
 
-from fastapi.responses import RedirectResponse, StreamingResponse
+from fastapi.responses import RedirectResponse
 
 app = FastAPI(debug=True)
 
@@ -96,7 +95,7 @@ def wrap_runmodel(argument: pd.DataFrame) -> pd.DataFrame:
     concentrations["NO"] = 0
     concentrations["H2SO4"] = 0
     concentrations["HNO3"] = 0
-    run_model_sm1(concentrations)
+    run_model_sm1(concentrations, verbose=True)
     argument["H2SO4"] = concentrations["H2SO4"]
     argument["HNO3"] = concentrations["HNO3"]
 
@@ -119,52 +118,6 @@ def wrap_corrosion_calc(argument: pd.DataFrame) -> pd.DataFrame:
     return argument
 
 
-def construct_df(
-    row: str,
-    column: str,
-    values,
-    concentrations: dict[str, float],
-    parameters: dict[str, float],
-) -> pd.DataFrame:
-    axes = [column, row]
-    indices = [(i / 2) + 0.5 for i in range(20)]
-
-    result = pd.DataFrame(
-        itertools.product(indices, repeat=len(axes)), columns=axes
-    )
-
-    for key, val in {**concentrations, **parameters}.items():
-        if key in axes:
-            continue
-        result[key] = val
-
-    result = result.apply(wrap_runmodel, axis=1)
-    if parameters:
-        result = result.apply(wrap_corrosion_calc, axis=1)
-
-    # The index parameter is used as the "vertical" axis, while the column parameter is the "horizontal" axis
-    plot_df = result.pivot_table(index=row, columns=column, values=values)
-    return plot_df
-
-
-@app.get("/api/export_csv")
-async def export_csv(
-    row: str,
-    column: str,
-    values: str,
-    concentrations: dict[str, float],
-    parameters: dict[str, float],
-):
-    plot_df = construct_df(
-        row,
-        column,
-        values,
-        concentrations,
-        parameters,
-    )
-    return plot_df.to_csv()
-
-
 class PipeInputs(BaseModel):
     inner_diameter: Annotated[float, Field(alias="innerDiameter")]
     drop_out_length: Annotated[float, Field(alias="dropOutLength")]
@@ -182,17 +135,29 @@ class RunMatrix(BaseModel):
 @app.post("/api/run_matrix")
 async def run_matrix(request: Request):
     data = RunMatrix.model_validate_json(await request.body())
-    df = construct_df(
-        data.row,
-        data.column,
-        data.value,
-        data.inputs,
-        data.pipe_inputs,
+
+    indices = [(i / 2) + 0.5 for i in range(20)]
+
+    result = pd.DataFrame(
+        itertools.product(indices, repeat=2), columns=(data.column, data.row)
     )
+
+    for key, val in {**data.inputs, **data.pipe_inputs}.items():
+        if key in (data.column, data.row):
+            continue
+        result[key] = val
+
+    logs = StringIO()
+    with redirect_stdout(logs):
+        result = result.apply(wrap_runmodel, axis=1)
+        if data.pipe_inputs:
+            result = result.apply(wrap_corrosion_calc, axis=1)
+
+    # The index parameter is used as the "vertical" axis, while the column parameter is the "horizontal" axis
+    df = result.pivot_table(index=data.row, columns=data.column, values=data.value)
 
     return {
         "plot": {
-            "name": "Hello, world",
             "z": df.values.tolist(),
             "x": df.index.tolist(),
             "y": df.columns.tolist(),
@@ -200,7 +165,7 @@ async def run_matrix(request: Request):
         "layout": {
             "grid": "bottom to top",
         },
-        "log": f"{df=}"
+        "logs": logs.getvalue(),
     }
 
 

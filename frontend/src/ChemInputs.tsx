@@ -8,7 +8,7 @@ interface ChemInputProps {
 
 function ChemInputs({ inputs, onChange }: ChemInputProps) {
   const fields = Object.entries(inputs).map(([key, value]) => (
-    <div key={key}>
+    <div>
       <Label htmlFor={key} label={key} />
       <Input
         name={key}

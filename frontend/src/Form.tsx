@@ -3,6 +3,12 @@ import { useState } from "react";
 import { ChemInputs } from "./ChemInputs";
 import { Autocomplete, Button } from "@equinor/eds-core-react";
 
+/* import Button from 'react-bootstrap/Button'; */
+
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+
 interface Defaults {
   inputs: [string: number];
   pipeInputs: [string: number];
@@ -57,36 +63,44 @@ function Form({ defaults, onSubmit }: FormProps) {
   }
 
   return (
-    <div>
-      <ChemInputs inputs={inputs} onChange={setInputs} />
-      <Autocomplete
-        label="Column parameter"
-        options={inputKeys}
-        initialSelectedOptions={[columnValue]}
-        onInputChange={(newValue) => setColumnValue(newValue)}
-        hideClearButton={true}
-      />
-      <div>
-        <Autocomplete
-          label="Row parameter"
-          options={inputKeys}
-          initialSelectedOptions={[rowValue]}
-          onInputChange={(newValue) => setRowValue(newValue)}
-          hideClearButton={true}
-        />
-      </div>
-      <div>
-        <Autocomplete
-          label="Value parameter"
-          options={outputKeys}
-          initialSelectedOptions={[valueValue]}
-          onInputChange={(newValue) => setValueValue(newValue)}
-          hideClearButton={true}
-        />
-      </div>
-      {pipeParams}
-      <Button onClick={handleSubmit}>Run Reactions</Button>
-    </div>
+    <>
+      <Row>
+        <Col>
+          <ChemInputs inputs={inputs} onChange={setInputs} />
+        </Col>
+        <Col>
+          <Autocomplete
+            label="Column parameter"
+            options={inputKeys}
+            initialSelectedOptions={[columnValue]}
+            onInputChange={(newValue) => setColumnValue(newValue)}
+            hideClearButton={true}
+          />
+          <Autocomplete
+            label="Row parameter"
+            options={inputKeys}
+            initialSelectedOptions={[rowValue]}
+            onInputChange={(newValue) => setRowValue(newValue)}
+            hideClearButton={true}
+          />
+          <Autocomplete
+            label="Value parameter"
+            options={outputKeys}
+            initialSelectedOptions={[valueValue]}
+            onInputChange={(newValue) => setValueValue(newValue)}
+            hideClearButton={true}
+          />
+        </Col>
+        <Col>{pipeParams}</Col>
+      </Row>
+      <Row>
+        <Col>
+          <div className="d-grid">
+            <Button onClick={handleSubmit}>Run Reactions</Button>
+          </div>
+        </Col>
+      </Row>
+    </>
   );
 }
 
