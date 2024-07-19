@@ -44,5 +44,9 @@
   pre-commit.hooks = {
     nixfmt.enable = true;
     nixfmt.package = pkgs.nixfmt-rfc-style;
+
+    prettier.enable = true;
+    prettier.settings.parser = "typescript";
+    prettier.files = ".tsx?$";
   };
 }

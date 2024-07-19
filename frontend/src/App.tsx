@@ -1,16 +1,9 @@
 import { useState, useEffect } from "react";
 
 import "./App.css";
-import { Form } from "./Form";
+import { Form, SubmitParams } from "./Form";
 import { Output } from "./Output";
 import { baseUrl } from "./util";
-
-interface SubmitParams {
-  inputs: [string: number];
-  columnValue: string;
-  rowValue: string;
-  valueValue: string;
-}
 
 function App() {
   const [defaults, setDefaults] = useState(null);

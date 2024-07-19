@@ -14,6 +14,11 @@ function ChemInputs({ inputs, onChange }: ChemInputProps) {
         name={key}
         value={value}
         onChange={(event: ChangeEvent<HTMLInputElement>) => {
+          if (!event.target.value) {
+            onChange({ ...inputs, [key]: 0 });
+            return;
+          }
+
           const value = parseFloat(event.target.value);
           if (value >= 0.0) onChange({ ...inputs, [key]: value });
         }}

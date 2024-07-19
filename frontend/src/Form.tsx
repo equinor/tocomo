@@ -5,6 +5,7 @@ import { Autocomplete, Button } from "@equinor/eds-core-react";
 
 interface Defaults {
   inputs: [string: number];
+  pipeInputs: [string: number];
   column: string;
   row: string;
   value: string;
@@ -13,6 +14,7 @@ interface Defaults {
 
 interface SubmitParams {
   inputs: [string: number];
+  pipeInputs: [string: number];
   columnValue: string;
   rowValue: string;
   valueValue: string;
@@ -25,6 +27,7 @@ interface FormProps {
 
 function Form({ defaults, onSubmit }: FormProps) {
   const [inputs, setInputs] = useState(defaults.inputs);
+  const [pipeInputs, setPipeInputs] = useState(defaults.pipeInputs);
   const [columnValue, setColumnValue] = useState(defaults.column);
   const [rowValue, setRowValue] = useState(defaults.row);
   const [valueValue, setValueValue] = useState(defaults.value);
@@ -37,11 +40,21 @@ function Form({ defaults, onSubmit }: FormProps) {
   const handleSubmit = () => {
     onSubmit({
       inputs,
+      pipeInputs,
       columnValue,
       rowValue,
       valueValue,
     });
   };
+
+  let pipeParams = null;
+  if (
+    valueValue === "H2SO4_corrosion" ||
+    valueValue === "HNO3_corrosion" ||
+    valueValue === "corrosion_rate"
+  ) {
+    pipeParams = <ChemInputs inputs={pipeInputs} onChange={setPipeInputs} />;
+  }
 
   return (
     <div>
@@ -71,9 +84,10 @@ function Form({ defaults, onSubmit }: FormProps) {
           hideClearButton={true}
         />
       </div>
+      {pipeParams}
       <Button onClick={handleSubmit}>Run Reactions</Button>
     </div>
   );
 }
 
-export { Form };
+export { Form, SubmitParams };

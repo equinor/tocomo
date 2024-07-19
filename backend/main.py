@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import Any, TypedDict, Annotated
+from typing import Any, Annotated
 
-from fastapi import FastAPI, Body, Form
+from fastapi import FastAPI
 from pydantic import BaseModel, Field
 import itertools
 import pandas as pd
@@ -27,6 +27,7 @@ origins = [
 class DefaultComponents(BaseModel):
     inputs: dict[str, float]
     outputs: list[str]
+    pipe_inputs: Annotated[dict[str, float], Field(alias="pipeInputs")]
     column: str
     row: str
     value: str
@@ -40,12 +41,20 @@ COMPOUNDS = DefaultComponents(
         "NO2": 20.0,
         "H2S": 0.0,
     },
+    pipeInputs={
+        "inner_diameter": 30.0,
+        "drop_out_length": 1000.0,
+        "flowrate": 20.0,
+    },
     outputs=[
         "H2SO4",
         "HNO3",
         "NO",
         "HNO2",
         "S8",
+        "H2SO4_corrosion",
+        "HNO3_corrosion",
+        "corrosion_rate",
     ],
     column="O2",
     row="NO2",
@@ -82,7 +91,7 @@ async def run_reactions(
 
 
 # This is a helper function we use to apply over our data frame. Should not be edited
-def wrap_runmodel(argument):
+def wrap_runmodel(argument: pd.DataFrame) -> pd.DataFrame:
     concentrations = argument.to_dict()
     concentrations["NO"] = 0
     concentrations["H2SO4"] = 0
@@ -95,7 +104,7 @@ def wrap_runmodel(argument):
 
 
 # This is a helper function we use to apply over our data frame. Should not be edited
-def wrap_corrosion_calc(argument):
+def wrap_corrosion_calc(argument: pd.DataFrame) -> pd.DataFrame:
     kwargs = argument.to_dict()
     area = surface_area(kwargs["inner_diameter"], kwargs["drop_out_length"])
     argument["H2SO4_corrosion"] = corrosion_rate_H2SO4(
@@ -116,7 +125,7 @@ def construct_df(
     values,
     concentrations: dict[str, float],
     parameters: dict[str, float],
-):
+) -> pd.DataFrame:
     axes = [column, row]
     indices = [(i / 2) + 0.5 for i in range(20)]
 
@@ -130,8 +139,10 @@ def construct_df(
         result[key] = val
 
     result = result.apply(wrap_runmodel, axis=1)
-    result = result.apply(wrap_corrosion_calc, axis=1)
+    if parameters:
+        result = result.apply(wrap_corrosion_calc, axis=1)
 
+    print(result)
     # The index parameter is used as the "vertical" axis, while the column parameter is the "horizontal" axis
     plot_df = result.pivot_table(index=row, columns=column, values=values)
     return plot_df
@@ -155,37 +166,24 @@ async def export_csv(
     return plot_df.to_csv()
 
 
+class PipeInputs(BaseModel):
+    inner_diameter: Annotated[float, Field(alias="innerDiameter")]
+    drop_out_length: Annotated[float, Field(alias="dropOutLength")]
+    flowrate: float
+
+
 class RunMatrix(BaseModel):
     row: str = Field(alias="rowValue")
     column: str = Field(alias="columnValue")
     value: str = Field(alias="valueValue")
     inputs: dict[str, float]
-    parameters: dict[str, float] = Field(default_factory=dict)
-
-    model_config = {
-            "json_schema_extra": {
-                "examples": [
-                    {
-                        "inputs": {
-                            "H2O": 30,
-                            "O2": 30,
-                            "SO2": 10,
-                            "NO2": 20,
-                            "H2S": 0,
-                        },
-                        "columnValue": "O2",
-                        "rowValue": "NO2",
-                        "valueValue": "H2SO4",
-                    }
-                ]
-            }
-        }
+    pipe_inputs: dict[str, float] = Field(default_factory=dict, alias="pipeInputs")
 
 
 @app.get("/api/run_matrix")
 async def run_matrix(
     q: str,
-):
+) -> StreamingResponse:
     data = RunMatrix.model_validate_json(q)
 
     plot_df = construct_df(
@@ -193,11 +191,7 @@ async def run_matrix(
         data.column,
         data.value,
         data.inputs,
-        {
-            "inner_diameter": 1.0,
-            "drop_out_length": 1.0,
-            "flowrate": 1.0,
-            },
+        data.pipe_inputs,
     )
 
     # Specify size for the final figure here
