@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Any, Annotated
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel, Field
 import itertools
 import pandas as pd
@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 
 
-from fastapi.responses import StreamingResponse
+from fastapi.responses import RedirectResponse, StreamingResponse
 
 app = FastAPI(debug=True)
 
@@ -142,7 +142,6 @@ def construct_df(
     if parameters:
         result = result.apply(wrap_corrosion_calc, axis=1)
 
-    print(result)
     # The index parameter is used as the "vertical" axis, while the column parameter is the "horizontal" axis
     plot_df = result.pivot_table(index=row, columns=column, values=values)
     return plot_df
@@ -180,13 +179,10 @@ class RunMatrix(BaseModel):
     pipe_inputs: dict[str, float] = Field(default_factory=dict, alias="pipeInputs")
 
 
-@app.get("/api/run_matrix")
-async def run_matrix(
-    q: str,
-) -> StreamingResponse:
-    data = RunMatrix.model_validate_json(q)
-
-    plot_df = construct_df(
+@app.post("/api/run_matrix")
+async def run_matrix(request: Request):
+    data = RunMatrix.model_validate_json(await request.body())
+    df = construct_df(
         data.row,
         data.column,
         data.value,
@@ -194,23 +190,23 @@ async def run_matrix(
         data.pipe_inputs,
     )
 
-    # Specify size for the final figure here
-    fig, ax = plt.subplots(figsize=(12, 7))
+    return {
+        "plot": {
+            "name": "Hello, world",
+            "z": df.values.tolist(),
+            "x": df.index.tolist(),
+            "y": df.columns.tolist(),
+        },
+        "layout": {
+            "grid": "bottom to top",
+        },
+        "log": f"{df=}"
+    }
 
-    sns.heatmap(plot_df, annot=True, ax=ax, cmap="YlOrBr", cbar=True)
-    ax.xaxis.tick_top()
-    ax.xaxis.set_label_position('top')
-    ax.set_yticklabels(ax.get_yticklabels(), rotation=0)
 
-    cbar = ax.collections[0].colorbar
-    cbar.ax.set_title(data.value, loc='center')
-
-    # Save the Seaborn plot to a BytesIO object
-    img = BytesIO()
-    plt.savefig(img, format="svg")
-    plt.close()
-    img.seek(0)
-    return StreamingResponse(img, media_type="image/svg+xml")
+@app.get("/")
+async def root() -> RedirectResponse:
+    return RedirectResponse("/docs")
 
 
 if __name__ == "__main__":
