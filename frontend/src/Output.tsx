@@ -4,20 +4,25 @@ import Plot from "react-plotly.js";
 import { baseUrl } from "./util";
 import { SubmitParams } from "./Form";
 
-let counter = 0;
-
 interface OutputProps {
   inputs: SubmitParams | null;
+}
+
+interface StateData {
+  plot: {
+    x: number[];
+    y: number[];
+    z: number[][];
+  };
 }
 
 function Output({ inputs }: OutputProps) {
   if (inputs === null) return;
 
-  const [state, setState] = useState(null);
+  const [state, setState] = useState<StateData | null>(null);
 
   useEffect(() => {
-    if (state !== null) return;
-
+    console.log("I'm fetching!");
     fetch(`${baseUrl}api/run_matrix`, {
       method: "POST",
       body: JSON.stringify(inputs),
@@ -25,13 +30,11 @@ function Output({ inputs }: OutputProps) {
       .then((resp) => resp.json())
       .then(setState)
       .catch(console.error);
-  }, [state]);
-
-  const url = `${baseUrl}api/run_matrix`;
+  }, [inputs]);
 
   if (state === null) return;
 
-  let layout = {
+  let layout: Partial<Plotly.Layout> = {
     yaxis: {
       autorange: "reversed",
     },
@@ -44,12 +47,12 @@ function Output({ inputs }: OutputProps) {
 
       let color = value < 5 ? "white" : "black";
 
-      layout.annotations.push({
-        xref: "x1",
-        yref: "y1",
+      layout.annotations?.push({
+        /* xref: "x1",
+         * yref: "y1", */
         x: state.plot.x[j],
         y: state.plot.y[i],
-        text: value.toString(),
+        text: value.toPrecision(2),
         showarrow: false,
         font: {
           size: 12,
@@ -59,14 +62,7 @@ function Output({ inputs }: OutputProps) {
     }
   }
 
-  const heatmap = {
-    x: state.plot.x,
-    y: state.plot.y,
-    z: state.plot.z,
-    type: "heatmap",
-  };
-
-  return <Plot data={[heatmap]} layout={layout} />;
+  return <Plot data={[{ ...state.plot, type: "heatmap" }]} layout={layout} />;
 }
 
 export { Output };
