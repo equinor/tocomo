@@ -7,8 +7,8 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Install TypeScript globally
-RUN npm install -g typescript
+# Install TypeScript and Vite globally
+RUN npm install -g typescript vite
 
 COPY . .
 
