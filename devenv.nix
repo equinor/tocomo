@@ -8,9 +8,10 @@
 
 {
   env.VITE_BACKEND_BASEURL = "http://localhost:5005/";
+  # process.implementation = "overmind";
 
   languages.javascript = {
-    directory = "./frontend";
+    directory = "frontend";
     enable = true;
 
     npm.enable = true;
@@ -18,17 +19,10 @@
   };
 
   languages.python = {
-    directory = "./backend";
+    directory = "backend";
     enable = true;
 
-    venv.enable = true;
-    venv.requirements = ''
-      fastapi[all]
-      uvicorn
-      pandas
-      matplotlib
-      seaborn
-    '';
+    poetry.enable = true;
   };
 
   processes.backend.exec = ''
