@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Plot from "react-plotly.js";
-import { TextField } from "@equinor/eds-core-react";
 
 import Row from "react-bootstrap/Row";
 import Form from "react-bootstrap/Form";
@@ -75,7 +74,7 @@ function Output({ inputs }: OutputProps) {
       </Row>
       <Row>
         <Form.Group>
-          <Form.Label label="Computation logs" />
+          <Form.Label>Computation logs</Form.Label>
           <Form.Control
             as="textarea"
             style={{ height: "24em" }}
