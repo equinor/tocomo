@@ -1,5 +1,7 @@
 from python:3.11-slim
 
+ENV POETRY_CACHE_DIR '/var/cache/pypoetry'
+
 COPY . app
 WORKDIR /app
 
