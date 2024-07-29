@@ -4,6 +4,7 @@ import Plot from "react-plotly.js";
 import Row from "react-bootstrap/Row";
 import Form from "react-bootstrap/Form";
 
+import Heatmap from "./Heatmap";
 import { baseUrl } from "./util";
 import { SubmitParams } from "./Form";
 
@@ -69,7 +70,7 @@ function Output({ inputs }: OutputProps) {
   return (
     <>
       <Row>
-        <Plot data={[{ ...state.plot, type: "heatmap" }]} layout={layout} />
+        <Heatmap grid={state.plot} />
       </Row>
       <Row>
         <Form.Group>

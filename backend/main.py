@@ -85,7 +85,7 @@ app.add_middleware(
 async def run_reactions(
     concentrations: dict[str, float],
 ) -> dict[str, float]:
-    run_model_sm1(concentrations, verbose=False)
+    run_model_sm1(concentrations)
     return concentrations
 
 
@@ -95,7 +95,7 @@ def wrap_runmodel(argument: pd.DataFrame) -> pd.DataFrame:
     concentrations["NO"] = 0
     concentrations["H2SO4"] = 0
     concentrations["HNO3"] = 0
-    run_model_sm1(concentrations, verbose=True)
+    run_model_sm1(concentrations)
     argument["H2SO4"] = concentrations["H2SO4"]
     argument["HNO3"] = concentrations["HNO3"]
 
