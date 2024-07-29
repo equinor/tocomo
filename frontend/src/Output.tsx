@@ -26,7 +26,6 @@ function Output({ inputs }: OutputProps) {
   const [state, setState] = useState<StateData | null>(null);
 
   useEffect(() => {
-    console.log("I'm fetching!");
     fetch(`${baseUrl}api/run_matrix`, {
       method: "POST",
       body: JSON.stringify(inputs),

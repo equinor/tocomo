@@ -40,6 +40,14 @@ function Form({ defaults, onSubmit }: FormProps) {
   );
   const outputKeys: string[] = defaults.outputs;
 
+  const handleReset = () => {
+    setInputs(defaults.inputs);
+    setPipeInputs(defaults.pipeInputs);
+    setColumnValue(defaults.column);
+    setRowValue(defaults.row);
+    setValueValue(defaults.value);
+  };
+
   const handleSubmit = () => {
     onSubmit({
       inputs,
@@ -91,10 +99,11 @@ function Form({ defaults, onSubmit }: FormProps) {
         <Col>{pipeParams}</Col>
       </Row>
       <Row>
-        <Col>
-          <div className="d-grid">
-            <Button onClick={handleSubmit}>Run Reactions</Button>
-          </div>
+        <Col className="d-grid">
+          <Button onClick={handleReset}>Reset Inputs</Button>
+        </Col>
+        <Col className="d-grid">
+          <Button onClick={handleSubmit}>Run Reactions</Button>
         </Col>
       </Row>
     </>
