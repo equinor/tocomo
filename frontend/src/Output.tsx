@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Plot from "react-plotly.js";
 
 import Row from "react-bootstrap/Row";
 import Form from "react-bootstrap/Form";
