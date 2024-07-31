@@ -6,10 +6,12 @@ from contextlib import redirect_stdout
 from fastapi import FastAPI, Request
 from pydantic import BaseModel, Field
 import itertools
+import numpy as np
 import pandas as pd
-from reactions import run_model_sm1
-from corrosion_calc import surface_area, corrosion_rate_HNO3, corrosion_rate_H2SO4
 from fastapi.middleware.cors import CORSMiddleware
+
+from .reactions import run_model_sm1
+from .corrosion_calc import surface_area, corrosion_rate_HNO3, corrosion_rate_H2SO4
 
 
 from fastapi.responses import RedirectResponse
@@ -26,7 +28,7 @@ origins = [
 class DefaultComponents(BaseModel):
     inputs: dict[str, float]
     outputs: list[str]
-    pipe_inputs: Annotated[dict[str, float], Field(alias="pipeInputs")]
+    pipe_inputs: Annotated[dict[str, float], Field(serialization_alias="pipeInputs")]
     column: str
     row: str
     value: str
@@ -40,7 +42,7 @@ COMPOUNDS = DefaultComponents(
         "NO2": 20.0,
         "H2S": 0.0,
     },
-    pipeInputs={
+    pipe_inputs={
         "inner_diameter": 30.0,
         "drop_out_length": 1000.0,
         "flowrate": 20.0,
@@ -90,7 +92,7 @@ async def run_reactions(
 
 
 # This is a helper function we use to apply over our data frame. Should not be edited
-def wrap_runmodel(argument: pd.DataFrame) -> pd.DataFrame:
+def wrap_runmodel(argument: pd.Series[float]) -> pd.Series[float]:
     concentrations = argument.to_dict()
     concentrations["NO"] = 0
     concentrations["H2SO4"] = 0
@@ -103,7 +105,7 @@ def wrap_runmodel(argument: pd.DataFrame) -> pd.DataFrame:
 
 
 # This is a helper function we use to apply over our data frame. Should not be edited
-def wrap_corrosion_calc(argument: pd.DataFrame) -> pd.DataFrame:
+def wrap_corrosion_calc(argument: pd.Series[float]) -> pd.Series[float]:
     kwargs = argument.to_dict()
     area = surface_area(kwargs["inner_diameter"], kwargs["drop_out_length"])
     argument["H2SO4_corrosion"] = corrosion_rate_H2SO4(
@@ -133,7 +135,7 @@ class RunMatrix(BaseModel):
 
 
 @app.post("/api/run_matrix")
-async def run_matrix(request: Request):
+async def run_matrix(request: Request) -> dict[str, Any]:
     data = RunMatrix.model_validate_json(await request.body())
 
     indices = [(i / 2) + 0.5 for i in range(20)]

@@ -1,12 +1,26 @@
 [tool.poetry]
 name = "co2specdemo-backend"
-package-mode = false
+version = "0.1.0"
+description = "Backend for CO2SpecDemo"
+authors = [
+  "Anna Kvashchuk <akvas@equinor.com>",
+  "Lars Petter Øren Hauge <lpha@equinor.com>",
+  "Olve Maudal <olvm@equinor.com>",
+  "Zohar Malamant <zom@equinor.com>",
+]
+repository = "https://github.com/equinor/co2specdemo"
+packages = [{ include = "co2specdemo_backend", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = {extras = ["all"], version = "^0.111.1"}
 uvicorn = "^0.30.3"
 pandas = "^2.2.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.2"
+mypy = "^1.11.1"
+pandas-stubs = "^2.2.2.240603"
 
 [build-system]
 requires = ["poetry-core"]

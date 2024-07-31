@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import math
+
 # given in  g/mol
 H2O_MOL_WEIGHT = 18
 FE_MOL_WEIGHT = 56
@@ -8,30 +12,30 @@ HNO3_MOL_WEIGHT = 63.01
 # given in g/cm3
 FE_DENSITY_S = 7.87
 
-import math
 
-
-def surface_area(inner_diameter, drop_out_length):
+def surface_area(inner_diameter: float, drop_out_length: float) -> float:
     # inner diameter in inch
     # drop out length in m
     # returns  cm2
     return math.pi * inner_diameter * 2.54 * drop_out_length * 100
 
 
-def corrosion_rate(rate, surface_area):
+def corrosion_rate(rate: float, surface_area: float) -> float:
     # rate is given in cm3/hour
     # surface area is given in cm2
     # returns mm/year
     return rate * 8760 * 10 / surface_area
 
 
-def convert_iron_rate(mol_rate):
+def convert_iron_rate(mol_rate: float) -> float:
     # rate given in mol/hour
     # returns cm3/hour
     return mol_rate * FE_MOL_WEIGHT / FE_DENSITY_S
 
 
-def corrosion_rate_H2SO4(surface_area, flowrate, molar_rate_H2SO4):
+def corrosion_rate_H2SO4(
+    surface_area: float, flowrate: float, molar_rate_H2SO4: float
+) -> float:
     """
     inner surface_area of pipeline
     flowrate of CO2 given in Millon tonnes per year MT/Y
@@ -51,7 +55,9 @@ def corrosion_rate_H2SO4(surface_area, flowrate, molar_rate_H2SO4):
     return corr_rate
 
 
-def corrosion_rate_HNO3(surface_area, flowrate, molar_rate_HNO3):
+def corrosion_rate_HNO3(
+    surface_area: float, flowrate: float, molar_rate_HNO3: float
+) -> float:
     """
     inner surface_area of pipeline
     flowrate of CO2 given in Millon tonnes per year MT/Y

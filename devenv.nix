@@ -27,12 +27,18 @@
 
   processes.backend.exec = ''
     cd ${config.devenv.root}/backend
-    uvicorn main:app --host 0.0.0.0 --port 5005 --reload
+    poetry run uvicorn main:app --host 0.0.0.0 --port 5005 --reload
   '';
 
   processes.frontend.exec = ''
     cd ${config.devenv.root}/frontend
     npm run dev
+  '';
+
+  enterTest = ''
+    cd backend
+    poetry run pytest tests
+    poetry run mypy --strict src
   '';
 
   pre-commit.hooks = {
