@@ -22,6 +22,9 @@ pytest = "^8.3.2"
 mypy = "^1.11.1"
 pandas-stubs = "^2.2.2.240603"
 
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

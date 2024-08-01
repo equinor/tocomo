@@ -25,10 +25,10 @@
     poetry.enable = true;
   };
 
-  processes.backend.exec = ''
-    cd ${config.devenv.root}/backend
-    poetry run uvicorn co2specdemo_backend.app:app --host 0.0.0.0 --port 5005 --reload
-  '';
+  processes.backend.exec = "
+    export PYTHONPATH=$PWD/backend/src:$PYTHONPATH
+    python -m co2specdemo_backend
+  ";
 
   processes.frontend.exec = ''
     cd ${config.devenv.root}/frontend
@@ -37,7 +37,6 @@
 
   enterTest = ''
     cd backend
-    export PYTHONPATH=$PWD/src:$PYTHONPATH
     pytest tests
     mypy --strict src
   '';

@@ -174,9 +174,3 @@ async def run_matrix(request: Request) -> dict[str, Any]:
 @app.get("/")
 async def root() -> RedirectResponse:
     return RedirectResponse("/docs")
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=5005)
