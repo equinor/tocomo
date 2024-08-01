@@ -36,9 +36,13 @@
   '';
 
   enterTest = ''
-    cd backend
+    cd ${config.devenv.root}/backend
     pytest tests
     mypy --strict src
+
+    cd ${config.devenv.root}/frontend
+    npm run lint
+    npm run build
   '';
 
   pre-commit.hooks = {
