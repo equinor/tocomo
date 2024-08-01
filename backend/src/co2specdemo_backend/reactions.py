@@ -1,127 +1,146 @@
 """Demo app for experimenting with CO2 impurities reactions."""
 
 from __future__ import annotations
-from typing import TypedDict
+
+from contextlib import redirect_stdout
+from enum import StrEnum, auto
+import io
+from pydantic import BaseModel
 
 
-class Reaction(TypedDict):
-    coefficients: dict[str, float]
-    id: int
-    eq: str
+class Molecule(StrEnum):
+    H2SO4 = auto()
+    HNO3 = auto()
+    HNO2 = auto()
+    SO2 = auto()
+    NO2 = auto()
+    H2S = auto()
+    H2O = auto()
+    S8 = auto()
+    O2 = auto()
+    NO = auto()
 
 
-def parse_reaction_string(reactions_strings: dict[int, str]) -> dict[int, Reaction]:
-    """Parse dict of reaction strings into dict of reaction coefficients."""
-    reactions: dict[int, Reaction] = {}
-    for index, line in reactions_strings.items():
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        reactants_part, products_part = line.split("->")
-        reactants_terms, products_terms = reactants_part.split(
-            "+"
-        ), products_part.split("+")
-        coefficients: dict[str, float] = {}
-        for term in reactants_terms:
-            term = term.strip()
-            if " " in term:
-                coeff_, reactant = term.split()
-                coeff = float(coeff_)
-            else:
-                coeff = 1
-                reactant = term
-            coefficients[reactant] = -coeff
-        for term in products_terms:
-            term = term.strip()
-            if " " in term:
-                coeff_, product = term.split()
-                coeff = float(coeff_)
-            else:
-                coeff = 1
-                product = term
-            coefficients[product] = +coeff
-        reactions[index] = {
-            "coefficients": coefficients,
-            "id": index,
-            "eq": line,
-        }
-    return reactions
+M = Molecule
 
 
-def print_header(concentrations: dict[str, float], *, newline: bool = True) -> None:
-    """Prettyprint a line with headers from the concentrations."""
-    substances = sorted(concentrations.keys())
-    for s in substances:
-        print(f"{s:>8}", end="")
-    if newline:
-        print()
+MOLECULE_TEXT = {
+    M.H2SO4: "H₂SO₄",
+    M.HNO3: "HNO₃",
+    M.HNO2: "HNO₂",
+    M.SO2: "SO₂",
+    M.NO2: "NO₂",
+    M.H2S: "H₂S",
+    M.H2O: "H₂O",
+    M.S8: "S₈",
+    M.O2: "O₂",
+    M.NO: "NO",
+}
 
 
-def print_values(concentrations: dict[str, float], *, newline: bool = True) -> None:
-    """Prettyprint a line with values from the concentrations."""
-    substances = sorted(concentrations.keys())
-    for s in substances:
-        v = concentrations[s]
-        print(f"{v:8.1f}", end="")
-    if newline:
-        print()
+class Reaction(BaseModel):
+    lhs: list[tuple[int, Molecule]]
+    rhs: list[tuple[int, Molecule]]
+    index: int
+    active: bool = True
 
+    def do(self, concentrations: dict[Molecule, float]) -> float:
+        mult = min(concentrations[m] / n for n, m in self.lhs)
+        if mult < 0.001:
+            return 0.0
 
-def can_react(concentrations: dict[str, float], reaction: Reaction) -> float:
-    """Return the number of times a given reaction can happen."""
-    coeff_multipliers = []
-    for substance, coeff in reaction["coefficients"].items():
-        if coeff < 0:
-            m = concentrations[substance] / -coeff
-            coeff_multipliers.append(m)
-    if any(m < 0.001 for m in coeff_multipliers):
-        return 0
-    else:
-        return min(coeff_multipliers)
+        for n, m in self.lhs:
+            concentrations[m] = concentrations[m] - mult * n
+        for n, m in self.rhs:
+            concentrations[m] = concentrations[m] + mult * n
 
+        substances = sorted(concentrations.keys())
+        for s in substances:
+            v = concentrations[s]
+            print(f"{v:8.1f}", end="")
+        print(f"    ### after applying eq {self.index} * {mult:.3f} : {self}")
+        return mult
 
-def do_react(
-    concentrations: dict[str, float], reaction: Reaction, *, verbose: bool = False
-) -> None:
-    """Apply a given reaction and modify concentrations accordingly."""
-    multiplier = can_react(concentrations, reaction)
-    assert multiplier > 0
-    for substance, coeff in reaction["coefficients"].items():
-        concentrations[substance] += coeff * multiplier
-    if verbose:
-        print_values(concentrations, newline=False)
-        print(
-            f"    ### after applying eq {reaction['id']} * {multiplier:.3f} : {reaction['eq']} "
+    def __str__(self) -> str:
+        return f"{self._tostr(self.lhs)} → {self._tostr(self.rhs)}"
+
+    @staticmethod
+    def _tostr(x: list[tuple[int, Molecule]]) -> str:
+        return " + ".join(
+            m if n == 1 else f"{n} {m}"
+            for n, m in ((n, MOLECULE_TEXT[m]) for n, m in x)
         )
 
 
-def run_model_sm1(concentrations: dict[str, float], *, verbose: bool = False) -> None:
+REACTIONS = [
+    Reaction(
+        index=3,
+        lhs=[(1, M.H2S), (3, M.NO2)],
+        rhs=[(1, M.SO2), (1, M.H2O), (3, M.NO)],
+    ),
+    Reaction(
+        index=2,
+        lhs=[(2, M.NO), (1, M.O2)],
+        rhs=[(2, M.NO2)],
+    ),
+    Reaction(
+        index=1,
+        lhs=[(1, M.NO2), (1, M.SO2), (1, M.H2O)],
+        rhs=[(1, M.NO), (1, M.H2SO4)],
+    ),
+    Reaction(
+        index=4,
+        lhs=[(3, M.NO2), (1, M.H2O)],
+        rhs=[(2, M.HNO3), (1, M.NO)],
+    ),
+    Reaction(
+        index=5,
+        lhs=[(2, M.NO2), (1, M.H2O)],
+        rhs=[(1, M.HNO3), (1, M.HNO2)],
+        active=False,
+    ),
+    Reaction(
+        index=6,
+        lhs=[(8, M.H2S), (4, M.O2)],
+        rhs=[(8, M.H2O), (1, M.S8)],
+    ),
+]
+
+
+class Result(BaseModel):
+    initial: dict[Molecule, float]
+    final: dict[Molecule, float]
+    max: dict[Molecule, float]
+    log: str
+
+
+def run_model_sm1(initial_concentrations: dict[Molecule, float]) -> Result:
     """
     Run reaction model as discussed with Sven Morten June 18.
     Updated with two more equations (5 and 6)
     """
 
-    reactions_strings = {
-        1: "NO2 + SO2 + H2O -> NO + H2SO4",
-        2: "2 NO + O2 -> 2 NO2",
-        3: "H2S + 3 NO2 -> SO2 + H2O + 3 NO",
-        4: "3 NO2 + H2O -> 2 HNO3 + NO",
-        5: "2 NO2 + H2O-> HNO3 + HNO2",
-        6: "8 H2S + 4 O2 -> 8 H2O + S8",
-    }
-    reactions = parse_reaction_string(reactions_strings)
+    # Clone input
+    concentrations = {**initial_concentrations}
 
-    reactions_possible = True
-    while reactions_possible:
-        if can_react(concentrations, reactions[3]):
-            do_react(concentrations, reactions[3], verbose=verbose)
-        elif can_react(concentrations, reactions[2]):
-            do_react(concentrations, reactions[2], verbose=verbose)
-        elif can_react(concentrations, reactions[1]):
-            do_react(concentrations, reactions[1], verbose=verbose)
-        elif can_react(concentrations, reactions[4]):
-            do_react(concentrations, reactions[4], verbose=verbose)
-        elif can_react(concentrations, reactions[6]):
-            do_react(concentrations, reactions[6], verbose=verbose)
-        else:
-            reactions_possible = False
+    logs = io.StringIO()
+    with redirect_stdout(logs):
+        substances = sorted(concentrations.keys())
+        for s in substances:
+            s = MOLECULE_TEXT[s]
+            print(f"{s:>8}", end="")
+        print()
+
+        while True:
+            for r in REACTIONS:
+                if r.active and r.do(concentrations):
+                    break
+            else:
+                break
+
+    return Result(
+        initial=initial_concentrations,
+        final=concentrations,
+        max=concentrations,
+        log=logs.getvalue(),
+    )

@@ -11,29 +11,94 @@ interface OutputProps {
   inputs: SubmitParams | null;
 }
 
+interface ResultData {
+  initial: [string: number];
+  final: [string: number];
+  max: [string: number];
+  log: string;
+}
+
 interface StateData {
   plot: {
     x: number[];
     y: number[];
     z: number[][];
   };
-  logs: string;
+  resultData: ResultData[][];
+}
+
+function Table({ resultData }: { resultData: ResultData }): React.ReactElement {
+  const columns = Object.keys(resultData.initial).sort();
+  const headers = columns.flatMap((x, i) => (
+    <th key={i} scope="col">
+      {x}
+    </th>
+  ));
+  const initial = columns.flatMap((x, i) => (
+    <td key={i}>{resultData.initial[x].toPrecision(4)}</td>
+  ));
+  const final = columns.flatMap((x, i) => (
+    <td key={i}>{resultData.final[x].toPrecision(4)}</td>
+  ));
+  const max = columns.flatMap((x, i) => (
+    <td key={i}>{resultData.max[x].toPrecision(4)}</td>
+  ));
+
+  return (
+    <table className="table table-hover">
+      <thead>
+        <th scope="col"></th>
+        {headers}
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Initial conditions</th>
+          {initial}
+        </tr>
+        <tr>
+          <th scope="row">Final conditions</th>
+          {final}
+        </tr>
+        <tr>
+          <th scope="row">Max</th>
+          {max}
+        </tr>
+      </tbody>
+    </table>
+  );
 }
 
 function Output({ inputs }: OutputProps) {
   const [state, setState] = useState<StateData | null>(null);
+  const [cell, setCell] = useState<number[] | null>(null);
 
   useEffect(() => {
+    if (inputs === null) return;
+
     fetch(`${baseUrl}api/run_matrix`, {
       method: "POST",
       body: JSON.stringify(inputs),
+      headers: {
+        "Content-Type": "application/json",
+      },
     })
       .then((resp) => resp.json())
+      .then((json) => {
+        if (json.detail !== undefined) {
+          throw json;
+        } else {
+          return json;
+        }
+      })
       .then(setState)
       .catch(console.error);
   }, [inputs]);
 
   if (inputs === null || state === null) return;
+
+  const handleClick = (event: Readonly<Plotly.PlotMouseEvent>) => {
+    setCell(event.points[0]!.pointIndex);
+  };
 
   const layout: Partial<Plotly.Layout> = {
     autosize: true,
@@ -63,24 +128,42 @@ function Output({ inputs }: OutputProps) {
     }
   }
 
+  let moreInfo = null;
+  if (cell !== null) {
+    const resultData = state.resultData[cell[0]][cell[1]];
+
+    moreInfo = (
+      <>
+        <Row>
+          <Table resultData={resultData} />
+        </Row>
+        <Row>
+          <Form.Group>
+            <Form.Label>Computation logs</Form.Label>
+            <Form.Control
+              as="textarea"
+              style={{ height: "24em" }}
+              readOnly
+              value={resultData.log}
+              className="bg-dark text-light font-monospace"
+              wrap="off"
+            />
+          </Form.Group>
+        </Row>
+      </>
+    );
+  }
+
   return (
     <>
       <Row>
-        <Plot data={[{ ...state.plot, type: "heatmap" }]} layout={layout} />
+        <Plot
+          data={[{ ...state.plot, type: "heatmap" }]}
+          layout={layout}
+          onClick={handleClick}
+        />
       </Row>
-      <Row>
-        <Form.Group>
-          <Form.Label>Computation logs</Form.Label>
-          <Form.Control
-            as="textarea"
-            style={{ height: "24em" }}
-            readOnly
-            value={state.logs}
-            className="bg-dark text-light font-monospace"
-            wrap="off"
-          />
-        </Form.Group>
-      </Row>
+      {moreInfo}
     </>
   );
 }

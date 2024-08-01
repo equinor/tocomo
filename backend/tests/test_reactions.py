@@ -1,7 +1,7 @@
 import pytest
 from co2specdemo_backend.reactions import (
-    can_react,
-    parse_reaction_string,
+    M,
+    Reaction,
     run_model_sm1,
 )
 from co2specdemo_backend.corrosion_calc import (
@@ -15,42 +15,29 @@ from co2specdemo_backend.corrosion_calc import (
 )
 
 
-def test_parse_reaction_string():
-    expected_reaction = {
-        "eq": "2 H + O -> H2O",
-        "coefficients": {"H2O": 1, "O": -1, "H": -2},
-        "id": 0,
-    }
-
-    assert parse_reaction_string({0: "2 H + O -> H2O"})[0] == expected_reaction
+def test_react():
+    reaction = Reaction(index=0, lhs=[(2, M.NO), (1, M.O2)], rhs=[(2, M.NO2)])
+    concentrations = {M.NO: 4.0, M.O2: 2.0}
+    assert reaction.do(concentrations) == 2
 
 
-def test_can_react():
-    # reaction = 2H + O -> H2O
-    reaction = {"coefficients": {"H2O": 2, "O": -1, "H": -2}}
-    concentrations = {"H": 4, "O": 2, "H2O": 0}
-    assert can_react(concentrations, reaction) == 2
-
-
-def test_can_react_simple():
+def test_react_simple():
     concentrations = {
-        "H2O": 30,
-        "O2": 10,
-        "SO2": 0,
-        "NO2": 1.5,
-        "H2S": 3,
-        "H2SO4": 0,
-        "HNO3": 0,
-        "NO": 0,
+        M.H2O: 30,
+        M.O2: 10,
+        M.SO2: 0,
+        M.NO2: 1.5,
+        M.H2S: 3,
+        M.H2SO4: 0,
+        M.HNO3: 0,
+        M.NO: 0,
     }
-    reaction_string = {
-        1: "NO2 + SO2 + H2O -> NO + H2SO4",
-        2: "2 NO + O2 -> 2 NO2",
-        3: "H2S + 3 NO2 -> SO2 + H2O + 3 NO",
-        4: "3 NO2 + H2O -> 2 HNO3 + NO",
-    }
-    reaction = parse_reaction_string(reaction_string)
-    assert can_react(concentrations, reaction[3]) == 0.5
+    reaction = Reaction(
+        index=3,
+        lhs=[(1, M.H2S), (3, M.NO2)],
+        rhs=[(1, M.SO2), (1, M.H2O), (3, M.NO)],
+    )
+    assert reaction.do(concentrations) == 0.5
 
 
 def test_corrosion_rate():
@@ -104,106 +91,106 @@ def normalize(concentrations):
     [
         pytest.param(
             {
-                "H2O": 40,
-                "O2": 15,
-                "SO2": 0,
-                "NO2": 15,
-                "H2S": 3,
-                "H2SO4": 0,
-                "HNO3": 0,
-                "NO": 0,
-                "HNO2": 0,
-                "S8": 0,
+                M.H2O: 40,
+                M.O2: 15,
+                M.SO2: 0,
+                M.NO2: 15,
+                M.H2S: 3,
+                M.H2SO4: 0,
+                M.HNO3: 0,
+                M.NO: 0,
+                M.HNO2: 0,
+                M.S8: 0,
             },
             {
-                "H2O": 32.5,
-                "O2": 5.3,
-                "SO2": 0.0,
-                "NO2": 0.0,
-                "H2S": 0.0,
-                "H2SO4": 3.0,
-                "HNO3": 15.0,
-                "NO": 0.0,
-                "HNO2": 0,
-                "S8": 0,
-            },
-        ),
-        pytest.param(
-            {
-                "H2O": 20,
-                "O2": 15,
-                "SO2": 0,
-                "NO2": 15,
-                "H2S": 3,
-                "H2SO4": 0,
-                "HNO3": 0,
-                "NO": 0,
-                "HNO2": 0,
-                "S8": 0,
-            },
-            {
-                "H2O": 12.5,
-                "O2": 5.3,
-                "SO2": 0.0,
-                "NO2": 0.0,
-                "H2S": 0.0,
-                "H2SO4": 3.0,
-                "HNO3": 15.0,
-                "NO": 0.0,
-                "HNO2": 0,
-                "S8": 0,
+                M.H2O: 32.5,
+                M.O2: 5.3,
+                M.SO2: 0.0,
+                M.NO2: 0.0,
+                M.H2S: 0.0,
+                M.H2SO4: 3.0,
+                M.HNO3: 15.0,
+                M.NO: 0.0,
+                M.HNO2: 0,
+                M.S8: 0,
             },
         ),
         pytest.param(
             {
-                "H2O": 20,
-                "O2": 5,
-                "SO2": 0,
-                "NO2": 8,
-                "H2S": 3,
-                "H2SO4": 0,
-                "HNO3": 0,
-                "NO": 0,
-                "HNO2": 0,
-                "S8": 0,
+                M.H2O: 20,
+                M.O2: 15,
+                M.SO2: 0,
+                M.NO2: 15,
+                M.H2S: 3,
+                M.H2SO4: 0,
+                M.HNO3: 0,
+                M.NO: 0,
+                M.HNO2: 0,
+                M.S8: 0,
             },
             {
-                "H2O": 18.0,
-                "O2": 0.0,
-                "SO2": 0.0,
-                "NO2": 0.0,
-                "H2S": 0.0,
-                "H2SO4": 3.0,
-                "HNO3": 4.0,
-                "NO": 4.0,
-                "HNO2": 0,
-                "S8": 0,
+                M.H2O: 12.5,
+                M.O2: 5.3,
+                M.SO2: 0.0,
+                M.NO2: 0.0,
+                M.H2S: 0.0,
+                M.H2SO4: 3.0,
+                M.HNO3: 15.0,
+                M.NO: 0.0,
+                M.HNO2: 0,
+                M.S8: 0,
             },
         ),
         pytest.param(
             {
-                "H2O": 20,
-                "O2": 5,
-                "SO2": 0,
-                "NO2": 8,
-                "H2S": 7,
-                "H2SO4": 0,
-                "HNO3": 0,
-                "NO": 0,
-                "HNO2": 0,
-                "S8": 0,
+                M.H2O: 20,
+                M.O2: 5,
+                M.SO2: 0,
+                M.NO2: 8,
+                M.H2S: 3,
+                M.H2SO4: 0,
+                M.HNO3: 0,
+                M.NO: 0,
+                M.HNO2: 0,
+                M.S8: 0,
             },
             {
-                "H2O": 26.0,
-                "O2": 0.0,
-                "SO2": 6.0,
-                "NO2": 0.0,
-                "H2S": 1.0,
-                "H2SO4": 0.0,
-                "HNO3": 0.0,
-                "NO": 8.0,
-                "HNO2": 0,
-                "S8": 0,
+                M.H2O: 18.0,
+                M.O2: 0.0,
+                M.SO2: 0.0,
+                M.NO2: 0.0,
+                M.H2S: 0.0,
+                M.H2SO4: 3.0,
+                M.HNO3: 4.0,
+                M.NO: 4.0,
+                M.HNO2: 0,
+                M.S8: 0,
+            },
+        ),
+        pytest.param(
+            {
+                M.H2O: 20,
+                M.O2: 5,
+                M.SO2: 0,
+                M.NO2: 8,
+                M.H2S: 7,
+                M.H2SO4: 0,
+                M.HNO3: 0,
+                M.NO: 0,
+                M.HNO2: 0,
+                M.S8: 0,
+            },
+            {
+                M.H2O: 26.0,
+                M.O2: 0.0,
+                M.SO2: 6.0,
+                M.NO2: 0.0,
+                M.H2S: 1.0,
+                M.H2SO4: 0.0,
+                M.HNO3: 0.0,
+                M.NO: 8.0,
+                M.HNO2: 0,
+                M.S8: 0,
             },
         ),
     ],

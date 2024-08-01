@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 from fastapi.middleware.cors import CORSMiddleware
 
-from .reactions import run_model_sm1
+from .reactions import Molecule, Result, run_model_sm1
 from .corrosion_calc import surface_area, corrosion_rate_HNO3, corrosion_rate_H2SO4
 
 
@@ -26,21 +26,22 @@ origins = [
 
 
 class DefaultComponents(BaseModel):
-    inputs: dict[str, float]
-    outputs: list[str]
+    inputs: dict[Molecule, float]
+    outputs: list[Molecule]
     pipe_inputs: Annotated[dict[str, float], Field(serialization_alias="pipeInputs")]
-    column: str
-    row: str
-    value: str
+    column: Molecule
+    row: Molecule
+    value: Molecule
 
 
+M = Molecule
 COMPOUNDS = DefaultComponents(
     inputs={
-        "H2O": 30.0,
-        "O2": 30.0,
-        "SO2": 10.0,
-        "NO2": 20.0,
-        "H2S": 0.0,
+        M.H2O: 30.0,
+        M.O2: 30.0,
+        M.SO2: 10.0,
+        M.NO2: 20.0,
+        M.H2S: 0.0,
     },
     pipe_inputs={
         "inner_diameter": 30.0,
@@ -48,18 +49,18 @@ COMPOUNDS = DefaultComponents(
         "flowrate": 20.0,
     },
     outputs=[
-        "H2SO4",
-        "HNO3",
-        "NO",
-        "HNO2",
-        "S8",
-        "H2SO4_corrosion",
-        "HNO3_corrosion",
-        "corrosion_rate",
+        M.H2SO4,
+        M.HNO3,
+        M.NO,
+        M.HNO2,
+        M.S8,
+        # "H2SO4_corrosion",
+        # "HNO3_corrosion",
+        # "corrosion_rate",
     ],
-    column="O2",
-    row="NO2",
-    value="H2SO4",
+    column=M.O2,
+    row=M.NO2,
+    value=M.H2SO4,
 )
 
 
@@ -92,19 +93,6 @@ async def run_reactions(
 
 
 # This is a helper function we use to apply over our data frame. Should not be edited
-def wrap_runmodel(argument: pd.Series[float]) -> pd.Series[float]:
-    concentrations = argument.to_dict()
-    concentrations["NO"] = 0
-    concentrations["H2SO4"] = 0
-    concentrations["HNO3"] = 0
-    run_model_sm1(concentrations)
-    argument["H2SO4"] = concentrations["H2SO4"]
-    argument["HNO3"] = concentrations["HNO3"]
-
-    return argument
-
-
-# This is a helper function we use to apply over our data frame. Should not be edited
 def wrap_corrosion_calc(argument: pd.Series[float]) -> pd.Series[float]:
     kwargs = argument.to_dict()
     area = surface_area(kwargs["inner_diameter"], kwargs["drop_out_length"])
@@ -127,47 +115,50 @@ class PipeInputs(BaseModel):
 
 
 class RunMatrix(BaseModel):
-    row: str = Field(alias="rowValue")
-    column: str = Field(alias="columnValue")
-    value: str = Field(alias="valueValue")
-    inputs: dict[str, float]
+    row: Molecule = Field(alias="rowValue")
+    column: Molecule = Field(alias="columnValue")
+    value: Molecule = Field(alias="valueValue")
+    inputs: dict[Molecule, float]
     pipe_inputs: dict[str, float] = Field(default_factory=dict, alias="pipeInputs")
 
 
 @app.post("/api/run_matrix")
-async def run_matrix(request: Request) -> dict[str, Any]:
-    data = RunMatrix.model_validate_json(await request.body())
+async def run_matrix(data: RunMatrix) -> dict[str, Any]:
+    xrange = np.arange(0.5, 10.5, 0.5)
+    yrange = np.arange(0.5, 10.5, 0.5)
+    values = np.empty(shape=(len(yrange), len(xrange)), dtype=np.float64)
 
-    indices = [(i / 2) + 0.5 for i in range(20)]
+    initial_concentrations = {**{m: 0.0 for m in M.__members__.values()}, **data.inputs}
 
-    result = pd.DataFrame(
-        itertools.product(indices, repeat=2), columns=(data.column, data.row)
-    )
+    results: list[list[Result]] = []
+    for yindex, yvalue in enumerate(yrange):
+        results.append([])
+        for xindex, xvalue in enumerate(xrange):
+            result = run_model_sm1(
+                {**initial_concentrations, data.row: yvalue, data.column: xvalue}
+            )
+            values[yindex, xindex] = result.final[data.value]
+            results[yindex].append(result)
 
-    for key, val in {**data.inputs, **data.pipe_inputs}.items():
-        if key in (data.column, data.row):
-            continue
-        result[key] = val
+    # for key, val in {**data.inputs, **data.pipe_inputs}.items():
+    #     if key in (data.column, data.row):
+    #         continue
+    #     result[key] = val
 
-    logs = StringIO()
-    with redirect_stdout(logs):
-        result = result.apply(wrap_runmodel, axis=1)
-        if data.pipe_inputs:
-            result = result.apply(wrap_corrosion_calc, axis=1)
-
-    # The index parameter is used as the "vertical" axis, while the column parameter is the "horizontal" axis
-    df = result.pivot_table(index=data.row, columns=data.column, values=data.value)
+    # result = result.apply(wrap_runmodel, axis=1)
+    # if data.pipe_inputs:
+    #     result = result.apply(wrap_corrosion_calc, axis=1)
 
     return {
         "plot": {
-            "z": df.values.tolist(),
-            "x": df.index.tolist(),
-            "y": df.columns.tolist(),
+            "z": values.tolist(),
+            "x": xrange.tolist(),
+            "y": yrange.tolist(),
         },
         "layout": {
             "grid": "bottom to top",
         },
-        "logs": logs.getvalue(),
+        "resultData": results,
     }
 
 
