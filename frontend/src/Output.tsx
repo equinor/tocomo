@@ -21,8 +21,6 @@ interface StateData {
 }
 
 function Output({ inputs }: OutputProps) {
-  if (inputs === null) return;
-
   const [state, setState] = useState<StateData | null>(null);
 
   useEffect(() => {
@@ -35,9 +33,9 @@ function Output({ inputs }: OutputProps) {
       .catch(console.error);
   }, [inputs]);
 
-  if (state === null) return;
+  if (inputs === null || state === null) return;
 
-  let layout: Partial<Plotly.Layout> = {
+  const layout: Partial<Plotly.Layout> = {
     autosize: true,
     yaxis: {
       autorange: "reversed",
@@ -45,11 +43,10 @@ function Output({ inputs }: OutputProps) {
     annotations: [],
   };
 
-  for (var i = 0; i < state.plot.y.length; i++) {
-    for (var j = 0; j < state.plot.x.length; j++) {
+  for (let i = 0; i < state.plot.y.length; i++) {
+    for (let j = 0; j < state.plot.x.length; j++) {
       const value = state.plot.z[i][j];
-
-      let color = value < 5 ? "white" : "black";
+      const color = value < 5 ? "white" : "black";
 
       layout.annotations?.push({
         /* xref: "x1",

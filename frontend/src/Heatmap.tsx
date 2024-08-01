@@ -30,15 +30,15 @@ function getMinMax(cells: number[][]): number[] {
 }
 
 function Heatmap({ grid }: HeatmapProps) {
-  let rows = [];
+  const rows = [];
 
-  let [min, max] = getMinMax(grid.z);
+  const [min, max] = getMinMax(grid.z);
   const r = (x: number) => (x - min) / (max - min);
   const calc = (x: number) => colorRange(r(x));
 
-  for (var i = 0; i < grid.y.length; i++) {
-    let cells = [];
-    for (var j = 0; j < grid.x.length; j++) {
+  for (let i = 0; i < grid.y.length; i++) {
+    const cells = [];
+    for (let j = 0; j < grid.x.length; j++) {
       const color = r(grid.z[i][j]) < 0.5 ? "white" : "black";
       cells.push(
         <td
