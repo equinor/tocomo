@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 
 import Row from "react-bootstrap/Row";
-import Form from "react-bootstrap/Form";
 
 import { baseUrl } from "./util";
 import { SubmitParams } from "./Form";
 import Plot from "react-plotly.js";
+import { Config } from "./Config";
 
 interface OutputProps {
+  config?: Config;
   inputs: SubmitParams | null;
 }
 
@@ -33,11 +34,17 @@ interface StateData {
   resultData: ResultData[][];
 }
 
-function Table({ resultData }: { resultData: ResultData }): React.ReactElement {
-  const columns = Object.keys(resultData.initial).sort();
+function Table({
+  config,
+  resultData,
+}: {
+  config: Config;
+  resultData: ResultData;
+}): React.ReactElement {
+  const columns = Object.keys(config.molecules);
   const headers = columns.flatMap((x, i) => (
     <th key={i} scope="col">
-      {x}
+      {config.molecules[x]}
     </th>
   ));
   const initial = columns.flatMap((x, i) => (
@@ -76,7 +83,56 @@ function Table({ resultData }: { resultData: ResultData }): React.ReactElement {
   );
 }
 
-function Output({ inputs }: OutputProps) {
+function Details({
+  config,
+  resultData,
+}: {
+  config: Config;
+  resultData: ResultData;
+}) {
+  const initialRow = (
+    <tr>
+      <td></td>
+      <td></td>
+      {Object.keys(config.molecules).flatMap((m, i) => (
+        <td key={i}>{resultData.initial[m].toPrecision(4)}</td>
+      ))}
+    </tr>
+  );
+
+  const rows = resultData.steps.flatMap((step) => {
+    return (
+      <tr>
+        <td>
+          <span className="badge bg-secondary">{step.reactionIndex}</span>&nbsp;
+          {config.reactions[step.reactionIndex]}
+        </td>
+        <td>{step.multiplier.toString()}</td>
+        {Object.keys(config.molecules).flatMap((m, i) => (
+          <td key={i}>{step.posterior[m].toPrecision(4)}</td>
+        ))}
+      </tr>
+    );
+  });
+
+  return (
+    <table className="table">
+      <tbody>
+        <tr>
+          <th>Reaction</th>
+          <th>Multiplier</th>
+          {Object.keys(config.molecules).flatMap((m, i) => (
+            <th key={i}>{config.molecules[m]}</th>
+          ))}
+        </tr>
+        {initialRow}
+        {rows}
+      </tbody>
+    </table>
+  );
+}
+
+function Output({ config, inputs }: OutputProps) {
   const [state, setState] = useState<StateData | null>(null);
   const [cell, setCell] = useState<number[] | null>(null);
 
@@ -141,27 +197,29 @@ function Output({ inputs }: OutputProps) {
   let moreInfo = null;
   if (cell !== null) {
     const resultData = state.resultData[cell[0]][cell[1]];
-    const molecules = Object.keys(resultData.final);
 
-    const plotData: Plotly.PlotData[] = molecules.flatMap((m) => {
+    const plotData: Partial<Plotly.PlotData>[] = Object.keys(
+      config!.molecules,
+    ).flatMap((m) => {
       return {
         y: [resultData.initial[m]].concat(
           resultData.steps.flatMap((s) => s.posterior[m]),
         ),
-        name: m,
+        name: config!.molecules[m],
         type: "scatter",
       };
     });
 
-    console.log(plotData);
-
     moreInfo = (
       <>
         <Row>
-          <Table resultData={resultData} />
+          <Table config={config!} resultData={resultData} />
         </Row>
         <Row>
-          <Plot data={plotData} />
+          <Plot data={plotData} layout={{}} />
+        </Row>
+        <Row>
+          <Details config={config!} resultData={resultData} />
         </Row>
       </>
     );

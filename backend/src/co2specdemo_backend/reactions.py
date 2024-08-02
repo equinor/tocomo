@@ -49,7 +49,7 @@ class Reaction(BaseModel):
     def do(
         self,
         concentrations: dict[Molecule, float],
-        aggregated_concentrations: dict[Molecule, float],
+        aggregated_concentrations: dict[Molecule, float] | None = None,
     ) -> float:
         mult = min(concentrations[m] / n for n, m in self.lhs)
         if mult < 0.001:
@@ -59,7 +59,8 @@ class Reaction(BaseModel):
             concentrations[m] = concentrations[m] - mult * n
         for n, m in self.rhs:
             concentrations[m] = concentrations[m] + mult * n
-            aggregated_concentrations[m] += mult * n
+            if aggregated_concentrations:
+                aggregated_concentrations[m] += mult * n
 
         substances = sorted(concentrations.keys())
         for s in substances:

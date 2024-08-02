@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from fastapi.middleware.cors import CORSMiddleware
 
-from .reactions import MOLECULE_TEXT, Molecule, Result, run_model_sm1
+from .reactions import MOLECULE_TEXT, REACTIONS, Molecule, Result, run_model_sm1
 from .corrosion_calc import surface_area, corrosion_rate_HNO3, corrosion_rate_H2SO4
 
 
@@ -59,6 +59,8 @@ class FormConfig(BaseModel):
     column: Molecule
     row: Molecule
     value: Molecule | str
+    molecules: dict[str, str]
+    reactions: dict[int, str]
 
 
 FORM_CONFIG = FormConfig(
@@ -87,6 +89,8 @@ FORM_CONFIG = FormConfig(
     column=M.O2,
     row=M.NO2,
     value=M.H2SO4,
+    molecules={x.value: MOLECULE_TEXT[x] for x in Molecule.__members__.values()},
+    reactions={x.index: str(x) for x in REACTIONS},
 )
 
 
