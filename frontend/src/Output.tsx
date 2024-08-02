@@ -20,7 +20,7 @@ interface StepData {
 interface ResultData {
   initial: { [key: string]: number };
   final: { [key: string]: number };
-  max: { [key: string]: number };
+  aggregated: { [key: string]: number };
   steps: StepData[];
 }
 
@@ -46,8 +46,8 @@ function Table({ resultData }: { resultData: ResultData }): React.ReactElement {
   const final = columns.flatMap((x, i) => (
     <td key={i}>{resultData.final[x].toPrecision(4)}</td>
   ));
-  const max = columns.flatMap((x, i) => (
-    <td key={i}>{resultData.max[x].toPrecision(4)}</td>
+  const agg = columns.flatMap((x, i) => (
+    <td key={i}>{resultData.aggregated[x].toPrecision(4)}</td>
   ));
 
   return (
@@ -68,8 +68,8 @@ function Table({ resultData }: { resultData: ResultData }): React.ReactElement {
           {final}
         </tr>
         <tr>
-          <th scope="row">Max</th>
-          {max}
+          <th scope="row">Aggregated concentrations</th>
+          {agg}
         </tr>
       </tbody>
     </table>

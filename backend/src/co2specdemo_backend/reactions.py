@@ -49,7 +49,7 @@ class Reaction(BaseModel):
     def do(
         self,
         concentrations: dict[Molecule, float],
-        max_concentrations: dict[Molecule, float],
+        aggregated_concentrations: dict[Molecule, float],
     ) -> float:
         mult = min(concentrations[m] / n for n, m in self.lhs)
         if mult < 0.001:
@@ -59,7 +59,7 @@ class Reaction(BaseModel):
             concentrations[m] = concentrations[m] - mult * n
         for n, m in self.rhs:
             concentrations[m] = concentrations[m] + mult * n
-            max_concentrations[m] = max(concentrations[m], max_concentrations[m])
+            aggregated_concentrations[m] += mult * n
 
         substances = sorted(concentrations.keys())
         for s in substances:
@@ -124,7 +124,7 @@ class _Step:
 class Result(BaseModel):
     initial: dict[Molecule, float]
     final: dict[Molecule, float]
-    max: dict[Molecule, float]
+    aggregated: dict[Molecule, float]
     steps: list[_Step]
 
 
@@ -136,12 +136,12 @@ def run_model_sm1(initial_concentrations: dict[Molecule, float]) -> Result:
 
     # Clone input
     concentrations = {**initial_concentrations}
-    max_concentrations = {**initial_concentrations}
+    aggregated_concentrations = {**initial_concentrations}
 
     steps: list[_Step] = []
     while True:
         for r in REACTIONS:
-            if r.active and (mult := r.do(concentrations, max_concentrations)):
+            if r.active and (mult := r.do(concentrations, aggregated_concentrations)):
                 steps.append(_Step({**concentrations}, mult, r.index))
                 break
         else:
@@ -150,6 +150,6 @@ def run_model_sm1(initial_concentrations: dict[Molecule, float]) -> Result:
     return Result(
         initial=initial_concentrations,
         final=concentrations,
-        max=max_concentrations,
+        aggregated=aggregated_concentrations,
         steps=steps,
     )
