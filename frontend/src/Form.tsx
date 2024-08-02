@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 import { Autocomplete, Button } from "@equinor/eds-core-react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 import { ChemInputs, FormControl } from "./ChemInputs";
-import { Config } from "./Config";
+import { ConfigContext } from "./Config";
 
 interface SubmitParams {
   inputs: { [key: string]: number };
@@ -16,7 +16,6 @@ interface SubmitParams {
 }
 
 interface FormProps {
-  config?: Config;
   onSubmit: (params: SubmitParams) => void;
 }
 
@@ -37,28 +36,30 @@ function getDefaultValues(inputs: FormControl[]): { [key: string]: number } {
   return values;
 }
 
-function Form({ config, onSubmit }: FormProps) {
-  const [inputs, setInputs] = useState(() => getDefaultValues(config!.inputs));
+function Form({ onSubmit }: FormProps) {
+  const config = useContext(ConfigContext);
+
+  const [inputs, setInputs] = useState(() => getDefaultValues(config.inputs));
   const [pipeInputs, setPipeInputs] = useState(() =>
-    getDefaultValues(config!.pipeInputs),
+    getDefaultValues(config.pipeInputs),
   );
   const [columnValue, setColumnValue] = useState(() =>
-    getDefaultOption(config!.column, config!.inputs),
+    getDefaultOption(config.column, config.inputs),
   );
   const [rowValue, setRowValue] = useState(() =>
-    getDefaultOption(config!.row, config!.inputs),
+    getDefaultOption(config.row, config.inputs),
   );
   const [valueValue, setValueValue] = useState(() =>
-    getDefaultOption(config!.value, config!.inputs, config!.outputs),
+    getDefaultOption(config.value, config.inputs, config.outputs),
   );
 
   const handleReset = () => {
-    setInputs(() => getDefaultValues(config!.inputs));
-    setPipeInputs(() => getDefaultValues(config!.pipeInputs));
-    setColumnValue(() => getDefaultOption(config!.column, config!.inputs));
-    setRowValue(() => getDefaultOption(config!.row, config!.inputs));
+    setInputs(() => getDefaultValues(config.inputs));
+    setPipeInputs(() => getDefaultValues(config.pipeInputs));
+    setColumnValue(() => getDefaultOption(config.column, config.inputs));
+    setRowValue(() => getDefaultOption(config.row, config.inputs));
     setValueValue(() =>
-      getDefaultOption(config!.row, config!.inputs, config!.outputs),
+      getDefaultOption(config.row, config.inputs, config.outputs),
     );
   };
 
@@ -77,7 +78,7 @@ function Form({ config, onSubmit }: FormProps) {
       <Row>
         <Col>
           <ChemInputs
-            inputs={config!.inputs}
+            inputs={config.inputs}
             values={inputs}
             onChange={setInputs}
           />
@@ -85,7 +86,7 @@ function Form({ config, onSubmit }: FormProps) {
         <Col>
           <Autocomplete
             label="Column parameter"
-            options={config!.inputs}
+            options={config.inputs}
             optionLabel={(x) => x.text}
             initialSelectedOptions={[columnValue]}
             onOptionsChange={(newValue) =>
@@ -95,7 +96,7 @@ function Form({ config, onSubmit }: FormProps) {
           />
           <Autocomplete
             label="Row parameter"
-            options={config!.inputs}
+            options={config.inputs}
             optionLabel={(x) => x.text}
             initialSelectedOptions={[rowValue]}
             onOptionsChange={(newValue) =>
@@ -105,7 +106,7 @@ function Form({ config, onSubmit }: FormProps) {
           />
           <Autocomplete
             label="Value parameter"
-            options={config!.outputs}
+            options={config.outputs}
             optionLabel={(x) => x.text}
             initialSelectedOptions={[valueValue]}
             onOptionsChange={(newValue) =>
@@ -117,7 +118,7 @@ function Form({ config, onSubmit }: FormProps) {
         <Col>
           {valueValue.needsPipeInput ? (
             <ChemInputs
-              inputs={config!.pipeInputs}
+              inputs={config.pipeInputs}
               values={pipeInputs}
               onChange={setPipeInputs}
             />

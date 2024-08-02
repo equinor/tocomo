@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import Row from "react-bootstrap/Row";
 
 import { baseUrl } from "./util";
 import { SubmitParams } from "./Form";
 import Plot from "react-plotly.js";
-import { Config } from "./Config";
+import { ConfigContext } from "./Config";
 
 interface OutputProps {
-  config?: Config;
   inputs: SubmitParams | null;
 }
 
@@ -34,13 +33,9 @@ interface StateData {
   resultData: ResultData[][];
 }
 
-function Table({
-  config,
-  resultData,
-}: {
-  config: Config;
-  resultData: ResultData;
-}): React.ReactElement {
+function Table({ resultData }: { resultData: ResultData }): React.ReactElement {
+  const config = useContext(ConfigContext);
+
   const columns = Object.keys(config.molecules);
   const headers = columns.flatMap((x, i) => (
     <th key={i} scope="col">
@@ -83,13 +78,9 @@ function Table({
   );
 }
 
-function Details({
-  config,
-  resultData,
-}: {
-  config: Config;
-  resultData: ResultData;
-}) {
+function Details({ resultData }: { resultData: ResultData }) {
+  const config = useContext(ConfigContext);
+
   const initialRow = (
     <tr>
       <td></td>
@@ -132,7 +123,8 @@ function Details({
   );
 }
 
-function Output({ config, inputs }: OutputProps) {
+function Output({ inputs }: OutputProps) {
+  const config = useContext(ConfigContext);
   const [state, setState] = useState<StateData | null>(null);
   const [cell, setCell] = useState<number[] | null>(null);
 
@@ -199,13 +191,13 @@ function Output({ config, inputs }: OutputProps) {
     const resultData = state.resultData[cell[0]][cell[1]];
 
     const plotData: Partial<Plotly.PlotData>[] = Object.keys(
-      config!.molecules,
+      config.molecules,
     ).flatMap((m) => {
       return {
         y: [resultData.initial[m]].concat(
           resultData.steps.flatMap((s) => s.posterior[m]),
         ),
-        name: config!.molecules[m],
+        name: config.molecules[m],
         type: "scatter",
       };
     });
@@ -213,13 +205,13 @@ function Output({ config, inputs }: OutputProps) {
     moreInfo = (
       <>
         <Row>
-          <Table config={config!} resultData={resultData} />
+          <Table resultData={resultData} />
         </Row>
         <Row>
           <Plot data={plotData} layout={{}} />
         </Row>
         <Row>
-          <Details config={config!} resultData={resultData} />
+          <Details resultData={resultData} />
         </Row>
       </>
     );

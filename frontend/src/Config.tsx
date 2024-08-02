@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { FormControl } from "./ChemInputs";
 import { baseUrl } from "./util";
 
@@ -12,6 +12,19 @@ export interface Config {
   molecules: { [key: string]: string };
   reactions: { [key: string]: string };
 }
+
+const defaultConfig: Config = {
+  inputs: [],
+  pipeInputs: [],
+  outputs: [],
+  column: "",
+  row: "",
+  value: "",
+  molecules: {},
+  reactions: {},
+};
+
+export const ConfigContext = createContext<Config>(defaultConfig);
 
 type Child = React.ReactElement<{ config: Config }, string>;
 
@@ -38,11 +51,7 @@ export function Config({ children }: { children: Child[] }) {
     return <pre>Loading!</pre>;
   } else {
     return (
-      <>
-        {React.Children.map(children, (child) =>
-          React.cloneElement(child, { config }),
-        )}
-      </>
+      <ConfigContext.Provider value={config}>{children}</ConfigContext.Provider>
     );
   }
 }
