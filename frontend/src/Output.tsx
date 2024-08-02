@@ -11,11 +11,17 @@ interface OutputProps {
   inputs: SubmitParams | null;
 }
 
+interface StepData {
+  posterior: { [key: string]: number };
+  multiplier: number;
+  reactionIndex: number;
+}
+
 interface ResultData {
   initial: { [key: string]: number };
   final: { [key: string]: number };
   max: { [key: string]: number };
-  log: string;
+  steps: StepData[];
 }
 
 interface StateData {
@@ -135,6 +141,19 @@ function Output({ inputs }: OutputProps) {
   let moreInfo = null;
   if (cell !== null) {
     const resultData = state.resultData[cell[0]][cell[1]];
+    const molecules = Object.keys(resultData.final);
+
+    const plotData: Plotly.PlotData[] = molecules.flatMap((m) => {
+      return {
+        y: [resultData.initial[m]].concat(
+          resultData.steps.flatMap((s) => s.posterior[m]),
+        ),
+        name: m,
+        type: "scatter",
+      };
+    });
+
+    console.log(plotData);
 
     moreInfo = (
       <>
@@ -142,17 +161,7 @@ function Output({ inputs }: OutputProps) {
           <Table resultData={resultData} />
         </Row>
         <Row>
-          <Form.Group>
-            <Form.Label>Computation logs</Form.Label>
-            <Form.Control
-              as="textarea"
-              style={{ height: "24em" }}
-              readOnly
-              value={resultData.log}
-              className="bg-dark text-light font-monospace"
-              wrap="off"
-            />
-          </Form.Group>
+          <Plot data={plotData} />
         </Row>
       </>
     );

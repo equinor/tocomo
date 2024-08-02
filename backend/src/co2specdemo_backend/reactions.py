@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 from contextlib import redirect_stdout
+from dataclasses import dataclass
 from enum import StrEnum, auto
 import io
-from pydantic import BaseModel
+from typing import Annotated
+from pydantic import BaseModel, Field
 
 
 class Molecule(StrEnum):
@@ -112,11 +114,18 @@ REACTIONS = [
 ]
 
 
+@dataclass
+class _Step:
+    posterior: dict[Molecule, float]
+    multiplier: float
+    reaction_index: Annotated[int, Field(serialization_alias="reactionIndex")]
+
+
 class Result(BaseModel):
     initial: dict[Molecule, float]
     final: dict[Molecule, float]
     max: dict[Molecule, float]
-    log: str
+    steps: list[_Step]
 
 
 def run_model_sm1(initial_concentrations: dict[Molecule, float]) -> Result:
@@ -129,24 +138,18 @@ def run_model_sm1(initial_concentrations: dict[Molecule, float]) -> Result:
     concentrations = {**initial_concentrations}
     max_concentrations = {**initial_concentrations}
 
-    logs = io.StringIO()
-    with redirect_stdout(logs):
-        substances = sorted(concentrations.keys())
-        for subst in substances:
-            s = MOLECULE_TEXT[subst]
-            print(f"{s:>8}", end="")
-        print()
-
-        while True:
-            for r in REACTIONS:
-                if r.active and r.do(concentrations, max_concentrations):
-                    break
-            else:
+    steps: list[_Step] = []
+    while True:
+        for r in REACTIONS:
+            if r.active and (mult := r.do(concentrations, max_concentrations)):
+                steps.append(_Step({**concentrations}, mult, r.index))
                 break
+        else:
+            break
 
     return Result(
         initial=initial_concentrations,
         final=concentrations,
         max=max_concentrations,
-        log=logs.getvalue(),
+        steps=steps,
     )
