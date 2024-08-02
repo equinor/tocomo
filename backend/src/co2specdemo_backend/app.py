@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Any, Annotated
 from io import StringIO
 from contextlib import redirect_stdout
+from dataclasses import dataclass
 
 from fastapi import FastAPI, Request
 from pydantic import BaseModel, Field
@@ -10,7 +11,7 @@ import numpy as np
 import pandas as pd
 from fastapi.middleware.cors import CORSMiddleware
 
-from .reactions import Molecule, Result, run_model_sm1
+from .reactions import MOLECULE_TEXT, Molecule, Result, run_model_sm1
 from .corrosion_calc import surface_area, corrosion_rate_HNO3, corrosion_rate_H2SO4
 
 
@@ -35,28 +36,53 @@ class DefaultComponents(BaseModel):
 
 
 M = Molecule
-COMPOUNDS = DefaultComponents(
-    inputs={
-        M.H2O: 30.0,
-        M.O2: 30.0,
-        M.SO2: 10.0,
-        M.NO2: 20.0,
-        M.H2S: 0.0,
-    },
-    pipe_inputs={
-        "inner_diameter": 30.0,
-        "drop_out_length": 1000.0,
-        "flowrate": 20.0,
-    },
+
+
+@dataclass
+class FormInput:
+    name: str
+    text: str
+    init: float | None = None
+    needs_pipe_input: Annotated[bool, Field(serialization_alias="needsPipeInput")] = (
+        False
+    )
+
+    @classmethod
+    def m(cls, molecule: Molecule, init: float | None = None) -> FormInput:
+        return FormInput(name=molecule.value, text=MOLECULE_TEXT[molecule], init=init)
+
+
+class FormConfig(BaseModel):
+    inputs: list[FormInput]
+    pipe_inputs: Annotated[list[FormInput], Field(serialization_alias="pipeInputs")]
+    outputs: list[FormInput]
+    column: Molecule
+    row: Molecule
+    value: Molecule | str
+
+
+FORM_CONFIG = FormConfig(
+    inputs=[
+        FormInput.m(M.H2O, 30.0),
+        FormInput.m(M.O2, 30.0),
+        FormInput.m(M.SO2, 10.0),
+        FormInput.m(M.NO2, 20.0),
+        FormInput.m(M.H2S, 0.0),
+    ],
+    pipe_inputs=[
+        FormInput("inner_diameter", "Inner Diameter", init=30.0),
+        FormInput("drop_out_length", "Drop-out Length", init=1000.0),
+        FormInput("flowrate", "Flow-rate", init=20.0),
+    ],
     outputs=[
-        M.H2SO4,
-        M.HNO3,
-        M.NO,
-        M.HNO2,
-        M.S8,
-        # "H2SO4_corrosion",
-        # "HNO3_corrosion",
-        # "corrosion_rate",
+        FormInput.m(M.H2SO4),
+        FormInput.m(M.HNO3),
+        FormInput.m(M.NO),
+        FormInput.m(M.HNO2),
+        FormInput.m(M.S8),
+        FormInput("H2SO4_corrosion", "H₂SO₄ Corrosion", needs_pipe_input=True),
+        FormInput("HNO3_corrosion", "HNO₃ Corrosion", needs_pipe_input=True),
+        FormInput("corrosion_rate", "Corrosion Rate", needs_pipe_input=True),
     ],
     column=M.O2,
     row=M.NO2,
@@ -64,9 +90,9 @@ COMPOUNDS = DefaultComponents(
 )
 
 
-@app.get("/api/compounds")
-async def get_compounds() -> DefaultComponents:
-    return COMPOUNDS
+@app.get("/api/form_config")
+async def get_config() -> FormConfig:
+    return FORM_CONFIG
 
 
 @app.get("/api/hello")

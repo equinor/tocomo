@@ -47,8 +47,10 @@ function Table({ resultData }: { resultData: ResultData }): React.ReactElement {
   return (
     <table className="table table-hover">
       <thead>
-        <th scope="col"></th>
-        {headers}
+        <tr>
+          <th scope="col"></th>
+          {headers}
+        </tr>
       </thead>
       <tbody>
         <tr>

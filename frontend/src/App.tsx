@@ -14,7 +14,7 @@ function App() {
 
     if (defaults !== null) return;
 
-    fetch(`${baseUrl}api/compounds`)
+    fetch(`${baseUrl}api/form_config`)
       .then((resp) => resp.json())
       .then((data) => {
         if (!ignore) setDefaults(data);

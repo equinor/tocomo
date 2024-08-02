@@ -1,18 +1,18 @@
 import { useState } from "react";
 
-import { ChemInputs } from "./ChemInputs";
+import { ChemInputs, FormControl } from "./ChemInputs";
 import { Autocomplete, Button } from "@equinor/eds-core-react";
 
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 interface Defaults {
-  inputs: [string: number];
-  pipeInputs: [string: number];
+  inputs: FormControl[];
+  pipeInputs: FormControl[];
+  outputs: FormControl[];
   column: string;
   row: string;
   value: string;
-  outputs: string[];
 }
 
 interface SubmitParams {
@@ -28,75 +28,109 @@ interface FormProps {
   onSubmit: (params: SubmitParams) => void;
 }
 
-function Form({ defaults, onSubmit }: FormProps) {
-  const [inputs, setInputs] = useState(defaults.inputs);
-  const [pipeInputs, setPipeInputs] = useState(defaults.pipeInputs);
-  const [columnValue, setColumnValue] = useState(defaults.column);
-  const [rowValue, setRowValue] = useState(defaults.row);
-  const [valueValue, setValueValue] = useState(defaults.value);
+function getDefaultOption(
+  name: string,
+  ...options: FormControl[][]
+): FormControl {
+  for (const opts of options) {
+    const o = opts.find((opt) => opt.name === name);
+    if (o !== undefined) return o;
+  }
+  throw "Option not found";
+}
 
-  const inputKeys: string[] = Object.keys(defaults.inputs).concat(
-    defaults.outputs,
+function getDefaultValues(inputs: FormControl[]): [string: number] {
+  let values: [string: number] = {};
+  for (const input of inputs) values[input.name] = input.init!;
+  return values;
+}
+
+function Form({ defaults, onSubmit }: FormProps) {
+  const [inputs, setInputs] = useState(() => getDefaultValues(defaults.inputs));
+  const [pipeInputs, setPipeInputs] = useState(() =>
+    getDefaultValues(defaults.pipeInputs),
   );
-  const outputKeys: string[] = defaults.outputs;
+  const [columnValue, setColumnValue] = useState(() =>
+    getDefaultOption(defaults.column, defaults.inputs),
+  );
+  const [rowValue, setRowValue] = useState(() =>
+    getDefaultOption(defaults.row, defaults.inputs),
+  );
+  const [valueValue, setValueValue] = useState(() =>
+    getDefaultOption(defaults.value, defaults.inputs, defaults.outputs),
+  );
 
   const handleReset = () => {
-    setInputs(defaults.inputs);
-    setPipeInputs(defaults.pipeInputs);
-    setColumnValue(defaults.column);
-    setRowValue(defaults.row);
-    setValueValue(defaults.value);
+    setInputs(() => getDefaultValues(defaults.inputs));
+    setPipeInputs(() => getDefaultValues(defaults.pipeInputs));
+    setColumnValue(() => getDefaultOption(defaults.column, defaults.inputs));
+    setRowValue(() => getDefaultOption(defaults.row, defaults.inputs));
+    setValueValue(() =>
+      getDefaultOption(defaults.row, defaults.inputs, defaults.outputs),
+    );
   };
 
   const handleSubmit = () => {
     onSubmit({
       inputs,
       pipeInputs,
-      columnValue,
-      rowValue,
-      valueValue,
+      columnValue: columnValue.name,
+      rowValue: rowValue.name,
+      valueValue: valueValue.name,
     });
   };
-
-  let pipeParams = null;
-  if (
-    valueValue === "H2SO4_corrosion" ||
-    valueValue === "HNO3_corrosion" ||
-    valueValue === "corrosion_rate"
-  ) {
-    pipeParams = <ChemInputs inputs={pipeInputs} onChange={setPipeInputs} />;
-  }
 
   return (
     <>
       <Row>
         <Col>
-          <ChemInputs inputs={inputs} onChange={setInputs} />
+          <ChemInputs
+            inputs={defaults.inputs}
+            values={inputs}
+            onChange={setInputs}
+          />
         </Col>
         <Col>
           <Autocomplete
             label="Column parameter"
-            options={inputKeys}
+            options={defaults.inputs}
+            optionLabel={(x) => x.text}
             initialSelectedOptions={[columnValue]}
-            onInputChange={(newValue) => setColumnValue(newValue)}
+            onOptionsChange={(newValue) =>
+              setColumnValue(newValue.selectedItems[0])
+            }
             hideClearButton={true}
           />
           <Autocomplete
             label="Row parameter"
-            options={inputKeys}
+            options={defaults.inputs}
+            optionLabel={(x) => x.text}
             initialSelectedOptions={[rowValue]}
-            onInputChange={(newValue) => setRowValue(newValue)}
+            onOptionsChange={(newValue) =>
+              setRowValue(newValue.selectedItems[0])
+            }
             hideClearButton={true}
           />
           <Autocomplete
             label="Value parameter"
-            options={outputKeys}
+            options={defaults.outputs}
+            optionLabel={(x) => x.text}
             initialSelectedOptions={[valueValue]}
-            onInputChange={(newValue) => setValueValue(newValue)}
+            onOptionsChange={(newValue) =>
+              setValueValue(newValue.selectedItems[0])
+            }
             hideClearButton={true}
           />
         </Col>
-        <Col>{pipeParams}</Col>
+        <Col>
+          {valueValue.needsPipeInput ? (
+            <ChemInputs
+              inputs={defaults.pipeInputs}
+              values={pipeInputs}
+              onChange={setPipeInputs}
+            />
+          ) : null}
+        </Col>
       </Row>
       <Row>
         <Col className="d-grid">
