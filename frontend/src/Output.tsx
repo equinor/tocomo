@@ -12,9 +12,9 @@ interface OutputProps {
 }
 
 interface ResultData {
-  initial: [string: number];
-  final: [string: number];
-  max: [string: number];
+  initial: { [key: string]: number };
+  final: { [key: string]: number };
+  max: { [key: string]: number };
   log: string;
 }
 
@@ -99,6 +99,8 @@ function Output({ inputs }: OutputProps) {
   if (inputs === null || state === null) return;
 
   const handleClick = (event: Readonly<Plotly.PlotMouseEvent>) => {
+    //@ts-expect-error Plotly.PlotDatum's pointIndex is incorrectly typed as
+    // number when it should be number[]
     setCell(event.points[0]!.pointIndex);
   };
 

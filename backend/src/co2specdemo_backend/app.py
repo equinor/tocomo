@@ -110,30 +110,6 @@ app.add_middleware(
 )
 
 
-@app.get("/api/run_reactions")
-async def run_reactions(
-    concentrations: dict[str, float],
-) -> dict[str, float]:
-    run_model_sm1(concentrations)
-    return concentrations
-
-
-# This is a helper function we use to apply over our data frame. Should not be edited
-def wrap_corrosion_calc(argument: pd.Series[float]) -> pd.Series[float]:
-    kwargs = argument.to_dict()
-    area = surface_area(kwargs["inner_diameter"], kwargs["drop_out_length"])
-    argument["H2SO4_corrosion"] = corrosion_rate_H2SO4(
-        area, kwargs["flowrate"], kwargs["H2SO4"]
-    )
-    argument["HNO3_corrosion"] = corrosion_rate_HNO3(
-        area, kwargs["flowrate"], kwargs["HNO3"]
-    )
-    argument["corrosion_rate"] = (
-        argument["H2SO4_corrosion"] + argument["HNO3_corrosion"]
-    )
-    return argument
-
-
 class PipeInputs(BaseModel):
     inner_diameter: Annotated[float, Field(alias="innerDiameter")]
     drop_out_length: Annotated[float, Field(alias="dropOutLength")]
@@ -143,7 +119,7 @@ class PipeInputs(BaseModel):
 class RunMatrix(BaseModel):
     row: Molecule = Field(alias="rowValue")
     column: Molecule = Field(alias="columnValue")
-    value: Molecule = Field(alias="valueValue")
+    value: str = Field(alias="valueValue")
     inputs: dict[Molecule, float]
     pipe_inputs: dict[str, float] = Field(default_factory=dict, alias="pipeInputs")
 
@@ -154,6 +130,12 @@ async def run_matrix(data: RunMatrix) -> dict[str, Any]:
     yrange = np.arange(0.5, 10.5, 0.5)
     values = np.empty(shape=(len(yrange), len(xrange)), dtype=np.float64)
 
+    value_key: Molecule | str = data.value
+    for m in Molecule.__members__.values():
+        if m.value == data.value:
+            value_key = m
+            break
+
     initial_concentrations = {**{m: 0.0 for m in M.__members__.values()}, **data.inputs}
 
     results: list[list[Result]] = []
@@ -163,17 +145,32 @@ async def run_matrix(data: RunMatrix) -> dict[str, Any]:
             result = run_model_sm1(
                 {**initial_concentrations, data.row: yvalue, data.column: xvalue}
             )
-            values[yindex, xindex] = result.final[data.value]
             results[yindex].append(result)
 
-    # for key, val in {**data.inputs, **data.pipe_inputs}.items():
-    #     if key in (data.column, data.row):
-    #         continue
-    #     result[key] = val
+            if isinstance(value_key, Molecule):
+                values[yindex, xindex] = result.final[value_key]
+            else:
+                area = surface_area(
+                    data.pipe_inputs["inner_diameter"],
+                    data.pipe_inputs["drop_out_length"],
+                )
+                flowrate = data.pipe_inputs["flowrate"]
 
-    # result = result.apply(wrap_runmodel, axis=1)
-    # if data.pipe_inputs:
-    #     result = result.apply(wrap_corrosion_calc, axis=1)
+                h2so4_corrosion = corrosion_rate_H2SO4(
+                    area, flowrate, result.final[M.H2SO4]
+                )
+                hno3_corrosion = corrosion_rate_HNO3(
+                    area, flowrate, result.final[M.HNO3]
+                )
+                corrosion_rate = h2so4_corrosion + hno3_corrosion
+
+                values[yindex, xindex] = {
+                    "H2SO4_corrision": h2so4_corrosion,
+                    "HNO3_corrosion": hno3_corrosion,
+                    "corrosion_rate": corrosion_rate,
+                }[value_key]
+
+            results[yindex].append(result)
 
     return {
         "plot": {

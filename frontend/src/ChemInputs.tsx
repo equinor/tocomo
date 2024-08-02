@@ -10,8 +10,8 @@ export interface FormControl {
 
 interface ChemInputProps {
   inputs: FormControl[];
-  values: [string: number];
-  onChange: (values: [string: number]) => void;
+  values: { [key: string]: number };
+  onChange: (values: { [key: string]: number }) => void;
 }
 
 export function ChemInputs({ inputs, values, onChange }: ChemInputProps) {

@@ -16,8 +16,8 @@ interface Defaults {
 }
 
 interface SubmitParams {
-  inputs: [string: number];
-  pipeInputs: [string: number];
+  inputs: { [key: string]: number };
+  pipeInputs: { [key: string]: number };
   columnValue: string;
   rowValue: string;
   valueValue: string;
@@ -39,8 +39,8 @@ function getDefaultOption(
   throw "Option not found";
 }
 
-function getDefaultValues(inputs: FormControl[]): [string: number] {
-  let values: [string: number] = {};
+function getDefaultValues(inputs: FormControl[]): { [key: string]: number } {
+  const values: { [key: string]: number } = {};
   for (const input of inputs) values[input.name] = input.init!;
   return values;
 }

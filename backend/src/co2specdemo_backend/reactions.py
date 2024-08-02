@@ -126,8 +126,8 @@ def run_model_sm1(initial_concentrations: dict[Molecule, float]) -> Result:
     logs = io.StringIO()
     with redirect_stdout(logs):
         substances = sorted(concentrations.keys())
-        for s in substances:
-            s = MOLECULE_TEXT[s]
+        for subst in substances:
+            s = MOLECULE_TEXT[subst]
             print(f"{s:>8}", end="")
         print()
 

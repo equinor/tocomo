@@ -17,7 +17,7 @@ from co2specdemo_backend.corrosion_calc import (
 
 def test_react():
     reaction = Reaction(index=0, lhs=[(2, M.NO), (1, M.O2)], rhs=[(2, M.NO2)])
-    concentrations = {M.NO: 4.0, M.O2: 2.0}
+    concentrations = {M.NO: 4.0, M.O2: 2.0, M.NO2: 0.0}
     assert reaction.do(concentrations) == 2
 
 
@@ -196,5 +196,5 @@ def normalize(concentrations):
     ],
 )
 def test_run_model_sm1_cases(initial, expected):
-    run_model_sm1(initial)
-    assert normalize(initial) == normalize(expected)
+    result = run_model_sm1(initial)
+    assert normalize(result.final) == normalize(expected)

@@ -29,7 +29,7 @@ function App() {
   if (defaults === null) {
     return (
       <>
-        <h1>CO2 spec demo</h1>
+        <h1>CO₂ spec demo</h1>
         <pre>Loading!</pre>
       </>
     );
@@ -37,7 +37,7 @@ function App() {
 
   return (
     <Container>
-      <h1 className="text-center">CO2 spec demo</h1>
+      <h1 className="text-center">CO₂ spec demo</h1>
       <Form defaults={defaults} onSubmit={setInputs} />
       <Output inputs={inputs} />
     </Container>
