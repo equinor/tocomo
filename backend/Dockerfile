@@ -15,4 +15,4 @@ EXPOSE 5005
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5005", "--reload"]
+CMD ["poetry", "run", "uvicorn", "co2specdemo_backend.app:app", "--host", "0.0.0.0", "--port", "5005", "--reload"]
