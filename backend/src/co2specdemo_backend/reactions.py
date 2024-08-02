@@ -44,7 +44,11 @@ class Reaction(BaseModel):
     index: int
     active: bool = True
 
-    def do(self, concentrations: dict[Molecule, float]) -> float:
+    def do(
+        self,
+        concentrations: dict[Molecule, float],
+        max_concentrations: dict[Molecule, float],
+    ) -> float:
         mult = min(concentrations[m] / n for n, m in self.lhs)
         if mult < 0.001:
             return 0.0
@@ -53,6 +57,7 @@ class Reaction(BaseModel):
             concentrations[m] = concentrations[m] - mult * n
         for n, m in self.rhs:
             concentrations[m] = concentrations[m] + mult * n
+            max_concentrations[m] = max(concentrations[m], max_concentrations[m])
 
         substances = sorted(concentrations.keys())
         for s in substances:
@@ -122,6 +127,7 @@ def run_model_sm1(initial_concentrations: dict[Molecule, float]) -> Result:
 
     # Clone input
     concentrations = {**initial_concentrations}
+    max_concentrations = {**initial_concentrations}
 
     logs = io.StringIO()
     with redirect_stdout(logs):
@@ -133,7 +139,7 @@ def run_model_sm1(initial_concentrations: dict[Molecule, float]) -> Result:
 
         while True:
             for r in REACTIONS:
-                if r.active and r.do(concentrations):
+                if r.active and r.do(concentrations, max_concentrations):
                     break
             else:
                 break
@@ -141,6 +147,6 @@ def run_model_sm1(initial_concentrations: dict[Molecule, float]) -> Result:
     return Result(
         initial=initial_concentrations,
         final=concentrations,
-        max=concentrations,
+        max=max_concentrations,
         log=logs.getvalue(),
     )
