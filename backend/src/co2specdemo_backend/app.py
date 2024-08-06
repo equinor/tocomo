@@ -61,6 +61,7 @@ class FormConfig(BaseModel):
     value: Molecule | str
     molecules: dict[str, str]
     reactions: dict[int, str]
+    reaction_order: list[int]
 
 
 FORM_CONFIG = FormConfig(
@@ -91,6 +92,7 @@ FORM_CONFIG = FormConfig(
     value=M.H2SO4,
     molecules={x.value: MOLECULE_TEXT[x] for x in Molecule.__members__.values()},
     reactions={x.index: str(x) for x in REACTIONS},
+    reaction_order=[x.index for x in REACTIONS],
 )
 
 

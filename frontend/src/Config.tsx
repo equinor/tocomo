@@ -11,6 +11,7 @@ export interface Config {
   value: string;
   molecules: { [key: string]: string };
   reactions: { [key: string]: string };
+  reaction_order: number[];
 }
 
 const defaultConfig: Config = {
@@ -22,6 +23,7 @@ const defaultConfig: Config = {
   value: "",
   molecules: {},
   reactions: {},
+  reaction_order: []
 };
 
 export const ConfigContext = createContext<Config>(defaultConfig);

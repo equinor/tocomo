@@ -16,9 +16,9 @@ function CalculationInformation() {
         an estimate of concentrations given a known input. A set of equations are
         applied in order:
       </p>
-      <ol>
-        {Object.keys(config.reactions).flatMap((v, i) => <li key={i}> {config.reactions[v].toString()}</li>)}
-      </ol>
+      <p>
+        {config.reaction_order.flatMap((v, i) => <div key={i}> <span className="badge bg-primary">{v}</span>  {config.reactions[v]}</div>)}
+      </p>
       <p>
         Some of the products in one equation is input to another, therefore the
         equations will be reapplied until no more reactions can occur. The
