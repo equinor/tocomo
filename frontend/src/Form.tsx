@@ -75,6 +75,12 @@ function Form({ onSubmit }: FormProps) {
 
   return (
     <>
+      <p>
+        Specify the value for each element and run the reactions. Some
+        ingredients are only required for specific values, such as pipe
+        dimensions are only needed for calculating corrosion rate. These
+        inputs are hidden until required.
+      </p>
       <Row>
         <Col>
           <ChemInputs
