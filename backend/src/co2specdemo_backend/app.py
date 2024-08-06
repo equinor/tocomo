@@ -169,7 +169,7 @@ async def run_matrix(data: RunMatrix) -> dict[str, Any]:
                 corrosion_rate = h2so4_corrosion + hno3_corrosion
 
                 values[yindex, xindex] = {
-                    "H2SO4_corrision": h2so4_corrosion,
+                    "H2SO4_corrosion": h2so4_corrosion,
                     "HNO3_corrosion": hno3_corrosion,
                     "corrosion_rate": corrosion_rate,
                 }[value_key]
