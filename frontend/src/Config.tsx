@@ -23,7 +23,7 @@ const defaultConfig: Config = {
   value: "",
   molecules: {},
   reactions: {},
-  reaction_order: []
+  reaction_order: [],
 };
 
 export const ConfigContext = createContext<Config>(defaultConfig);

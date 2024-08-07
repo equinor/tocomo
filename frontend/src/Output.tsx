@@ -52,39 +52,41 @@ function Table({ resultData }: { resultData: ResultData }): React.ReactElement {
     <td key={i}>{resultData.aggregated[x].toPrecision(4)}</td>
   ));
 
-  return (<>
-    <p>
-      Contains the concentrations for the point clicked in the heatmap. In
-      addition to listing the initial and final concentration we include
-      aggregated values for each element. If an element is a product and an
-      input said element could be 0 at both initial and final condition, but
-      still have been produced before being consumed. Hence we display the total
-      amount of each element that has been produced including as intermediate
-      results.
-    </p>
-    <table className="table table-hover">
-      <thead>
-        <tr>
-          <th scope="col"></th>
-          {headers}
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <th scope="row">Initial conditions</th>
-          {initial}
-        </tr>
-        <tr>
-          <th scope="row">Final conditions</th>
-          {final}
-        </tr>
-        <tr>
-          <th scope="row">Aggregated concentrations</th>
-          {agg}
-        </tr>
-      </tbody>
-    </table>
-  </>);
+  return (
+    <>
+      <p>
+        Contains the concentrations for the point clicked in the heatmap. In
+        addition to listing the initial and final concentration we include
+        aggregated values for each element. If an element is a product and an
+        input said element could be 0 at both initial and final condition, but
+        still have been produced before being consumed. Hence we display the
+        total amount of each element that has been produced including as
+        intermediate results.
+      </p>
+      <table className="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            {headers}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Initial conditions</th>
+            {initial}
+          </tr>
+          <tr>
+            <th scope="row">Final conditions</th>
+            {final}
+          </tr>
+          <tr>
+            <th scope="row">Aggregated concentrations</th>
+            {agg}
+          </tr>
+        </tbody>
+      </table>
+    </>
+  );
 }
 
 function Details({ resultData }: { resultData: ResultData }) {
@@ -212,19 +214,21 @@ function Output({ inputs }: OutputProps) {
     });
     const plotinfo = (
       <p>
-        The plot shows the concentration of each element after
-        a reaction has been applied. The first and last set of values on the y
-        axis represents the initial and final conditions. The plot is
-        interactive and you can hide individual lines (by clicking on their
-        legend), and hover to get exact values.
-      </p>)
+        The plot shows the concentration of each element after a reaction has
+        been applied. The first and last set of values on the y axis represents
+        the initial and final conditions. The plot is interactive and you can
+        hide individual lines (by clicking on their legend), and hover to get
+        exact values.
+      </p>
+    );
 
     const detailedInfoDesc = (
       <p>
         Here each reaction that is applied is listed together with the
         concentration after the reaction is applied. It is possible to follow
         the concentration values one after another by including the multiplier.
-      </p>)
+      </p>
+    );
 
     moreInfo = (
       <>

@@ -1,10 +1,9 @@
 import { useState, useContext } from "react";
 
-import { Form, SubmitParams } from "./Form"; import { Output } from "./Output";
-import Container from "react-bootstrap/Container"; import {
-  Config,
-  ConfigContext
-} from "./Config";
+import { Form, SubmitParams } from "./Form";
+import { Output } from "./Output";
+import Container from "react-bootstrap/Container";
+import { Config, ConfigContext } from "./Config";
 
 function CalculationInformation() {
   const config = useContext(ConfigContext);
@@ -12,12 +11,17 @@ function CalculationInformation() {
   return (
     <>
       <p>
-        The CO₂ specification calculator provides a way to give
-        an estimate of concentrations given a known input. A set of equations are
-        applied in order:
+        The CO₂ specification calculator provides a way to give an estimate of
+        concentrations given a known input. A set of equations are applied in
+        order:
       </p>
       <p>
-        {config.reaction_order.flatMap((v, i) => <div key={i}> <span className="badge bg-primary">{v}</span>  {config.reactions[v]}</div>)}
+        {config.reaction_order.flatMap((v, i) => (
+          <div key={i}>
+            {" "}
+            <span className="badge bg-primary">{v}</span> {config.reactions[v]}
+          </div>
+        ))}
       </p>
       <p>
         Some of the products in one equation is input to another, therefore the
@@ -27,7 +31,8 @@ function CalculationInformation() {
         equation we continue to the next. If a reaction can occur it will be
         applied and then we start from the top again.
       </p>
-    </>);
+    </>
+  );
 }
 
 function App() {
