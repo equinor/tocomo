@@ -171,8 +171,13 @@ function Output({ inputs }: OutputProps) {
 
   const layout: Partial<Plotly.Layout> = {
     autosize: true,
+    title: config.molecules[inputs.valueValue],
     yaxis: {
+      title: config.molecules[inputs.columnValue],
       autorange: "reversed",
+    },
+    xaxis: {
+      title: config.molecules[inputs.rowValue],
     },
     annotations: [],
   };
