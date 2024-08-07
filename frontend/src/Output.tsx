@@ -173,11 +173,11 @@ function Output({ inputs }: OutputProps) {
     autosize: true,
     title: config.molecules[inputs.valueValue],
     yaxis: {
-      title: config.molecules[inputs.columnValue],
+      title: config.molecules[inputs.rowValue],
       autorange: "reversed",
     },
     xaxis: {
-      title: config.molecules[inputs.rowValue],
+      title: config.molecules[inputs.columnValue],
     },
     annotations: [],
   };
