@@ -89,37 +89,39 @@ function Form({ onSubmit }: FormProps) {
             onChange={setInputs}
           />
         </Col>
-        <Col>
-          <Autocomplete
-            label="Column parameter"
-            options={config.inputs}
-            optionLabel={(x) => x.text}
-            initialSelectedOptions={[columnValue]}
-            onOptionsChange={(newValue) =>
-              setColumnValue(newValue.selectedItems[0])
-            }
-            hideClearButton={true}
-          />
-          <Autocomplete
-            label="Row parameter"
-            options={config.inputs}
-            optionLabel={(x) => x.text}
-            initialSelectedOptions={[rowValue]}
-            onOptionsChange={(newValue) =>
-              setRowValue(newValue.selectedItems[0])
-            }
-            hideClearButton={true}
-          />
-          <Autocomplete
-            label="Value parameter"
-            options={config.outputs}
-            optionLabel={(x) => x.text}
-            initialSelectedOptions={[valueValue]}
-            onOptionsChange={(newValue) =>
-              setValueValue(newValue.selectedItems[0])
-            }
-            hideClearButton={true}
-          />
+        <Col >
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <Autocomplete
+              label="Column parameter"
+              options={config.inputs}
+              optionLabel={(x) => x.text}
+              initialSelectedOptions={[columnValue]}
+              onOptionsChange={(newValue) =>
+                setColumnValue(newValue.selectedItems[0])
+              }
+              hideClearButton={true}
+            />
+            <Autocomplete
+              label="Row parameter"
+              options={config.inputs}
+              optionLabel={(x) => x.text}
+              initialSelectedOptions={[rowValue]}
+              onOptionsChange={(newValue) =>
+                setRowValue(newValue.selectedItems[0])
+              }
+              hideClearButton={true}
+            />
+            <Autocomplete
+              label="Value parameter"
+              options={config.outputs}
+              optionLabel={(x) => x.text}
+              initialSelectedOptions={[valueValue]}
+              onOptionsChange={(newValue) =>
+                setValueValue(newValue.selectedItems[0])
+              }
+              hideClearButton={true}
+            />
+          </div>
         </Col>
         <Col>
           {valueValue.needsPipeInput ? (

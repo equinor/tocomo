@@ -34,5 +34,5 @@ export function ChemInputs({ inputs, values, onChange }: ChemInputProps) {
       />
     </div>
   ));
-  return <div>{fields}</div>;
+  return <div style={{ display: "flex", flexDirection: "column", gap: "16px" }} >{fields}</div>;
 }
