@@ -19,7 +19,7 @@ function CalculationInformation() {
         {config.reaction_order.flatMap((v, i) => (
           <div key={i}>
             {" "}
-            <span className="badge bg-primary">{v}</span> {config.reactions[v]}
+            <span className="badge bg-secondary">{v}</span> {config.reactions[v]}
           </div>
         ))}
       </p>
