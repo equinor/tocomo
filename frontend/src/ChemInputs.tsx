@@ -1,5 +1,5 @@
 import { ChangeEvent } from "react";
-import { Input, Label } from "@equinor/eds-core-react";
+import { TextField } from "@equinor/eds-core-react";
 
 export interface FormControl {
   name: string;
@@ -17,8 +17,9 @@ interface ChemInputProps {
 export function ChemInputs({ inputs, values, onChange }: ChemInputProps) {
   const fields = inputs.flatMap((input) => (
     <div key={input.name}>
-      <Label htmlFor={input.name} label={input.text} />
-      <Input
+      <TextField
+        id={Math.random().toString()}
+        label={input.text}
         name={input.name}
         value={values[input.name]}
         onChange={(event: ChangeEvent<HTMLInputElement>) => {
