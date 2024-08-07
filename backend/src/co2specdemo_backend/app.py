@@ -151,7 +151,6 @@ async def run_matrix(data: RunMatrix) -> dict[str, Any]:
             result = run_model_sm1(
                 {**initial_concentrations, data.row: yvalue, data.column: xvalue}
             )
-            results[yindex].append(result)
 
             if isinstance(value_key, Molecule):
                 values[yindex, xindex] = result.final[value_key]
