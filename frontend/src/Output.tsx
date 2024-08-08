@@ -137,7 +137,7 @@ function Details({ resultData }: { resultData: ResultData }) {
 function Output({ inputs }: OutputProps) {
   const config = useContext(ConfigContext);
   const [state, setState] = useState<StateData | null>(null);
-  const [cell, setCell] = useState<number[] | null>(null);
+  const [cell, setCell] = useState<number[]>([5, 5]);
 
   useEffect(() => {
     if (inputs === null) return;
