@@ -89,8 +89,10 @@ function Form({ onSubmit }: FormProps) {
             onChange={setInputs}
           />
         </Col>
-        <Col >
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <Col>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+          >
             <Autocomplete
               label="Column parameter"
               options={config.inputs}
