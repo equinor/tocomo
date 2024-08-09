@@ -7,6 +7,8 @@ import { SubmitParams } from "./Form";
 import Plot from "react-plotly.js";
 import { ConfigContext } from "./Config";
 
+import { Table, Typography } from "@equinor/eds-core-react";
+
 interface OutputProps {
   inputs: SubmitParams | null;
 }
@@ -33,58 +35,76 @@ interface StateData {
   resultData: ResultData[][];
 }
 
-function Table({ resultData }: { resultData: ResultData }): React.ReactElement {
+function formatNumber(n: number): string {
+  return !n ? "-" : n.toPrecision(4);
+}
+
+function ResultTable({
+  resultData,
+  row,
+  column,
+}: {
+  resultData: ResultData;
+  row: number;
+  column: number;
+}): React.ReactElement {
   const config = useContext(ConfigContext);
 
   const columns = Object.keys(config.molecules);
   const headers = columns.flatMap((x, i) => (
-    <th key={i} scope="col">
-      {config.molecules[x]}
-    </th>
+    <Table.Cell key={i}>{config.molecules[x]}</Table.Cell>
   ));
   const initial = columns.flatMap((x, i) => (
-    <td key={i}>{resultData.initial[x].toPrecision(4)}</td>
+    <Table.Cell key={i}>{formatNumber(resultData.initial[x])}</Table.Cell>
   ));
   const final = columns.flatMap((x, i) => (
-    <td key={i}>{resultData.final[x].toPrecision(4)}</td>
+    <Table.Cell key={i}>{formatNumber(resultData.final[x])}</Table.Cell>
   ));
   const agg = columns.flatMap((x, i) => (
-    <td key={i}>{resultData.aggregated[x].toPrecision(4)}</td>
+    <Table.Cell key={i}>{formatNumber(resultData.aggregated[x])}</Table.Cell>
   ));
+
+  const explanation = <></>;
 
   return (
     <>
-      <p>
-        Contains the concentrations for the point clicked in the heatmap. In
-        addition to listing the initial and final concentration we include
-        aggregated values for each element. If an element is a product and an
-        input said element could be 0 at both initial and final condition, but
-        still have been produced before being consumed. Hence we display the
-        total amount of each element that has been produced including as
-        intermediate results.
-      </p>
-      <table className="table table-hover">
-        <thead>
-          <tr>
-            <th scope="col"></th>
+      <p></p>
+      <Table>
+        <Table.Caption>
+          <Typography variant="h2">
+            {`Details for heatmap cell ${row}, ${column}`}
+          </Typography>
+          <Typography variant="body_long">
+            Table of concentrations for the point clicked in the heatmap. In
+            addition to listing the initial and final concentration we include
+            aggregated values for each element. If an element is a product and
+            an input said element could be 0 at both initial and final
+            condition, but still have been produced before being consumed. Hence
+            we display the total amount of each element that has been produced
+            including as intermediate results.
+          </Typography>
+        </Table.Caption>
+        <Table.Head>
+          <Table.Row>
+            <Table.Cell></Table.Cell>
             {headers}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">Initial conditions</th>
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>
+          <Table.Row>
+            <Table.Cell>Initial conditions</Table.Cell>
             {initial}
-          </tr>
-          <tr>
-            <th scope="row">Final conditions</th>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>Final conditions</Table.Cell>
             {final}
-          </tr>
-          <tr>
-            <th scope="row">Aggregated concentrations</th>
+          </Table.Row>
+          <Table.Row>
+            <Table.Cell>Aggregated concentrations</Table.Cell>
             {agg}
-          </tr>
-        </tbody>
-      </table>
+          </Table.Row>
+        </Table.Body>
+      </Table>
     </>
   );
 }
@@ -93,44 +113,54 @@ function Details({ resultData }: { resultData: ResultData }) {
   const config = useContext(ConfigContext);
 
   const initialRow = (
-    <tr>
-      <td></td>
-      <td></td>
+    <Table.Row>
+      <Table.Cell colSpan={2}></Table.Cell>
       {Object.keys(config.molecules).flatMap((m, i) => (
-        <td key={i}>{resultData.initial[m].toPrecision(4)}</td>
+        <Table.Cell key={i}>{formatNumber(resultData.initial[m])}</Table.Cell>
       ))}
-    </tr>
+    </Table.Row>
   );
 
   const rows = resultData.steps.flatMap((step) => {
     return (
-      <tr>
-        <td>
+      <Table.Row>
+        <Table.Cell>
           <span className="badge bg-secondary">{step.reactionIndex}</span>&nbsp;
           {config.reactions[step.reactionIndex]}
-        </td>
-        <td>{step.multiplier.toString()}</td>
+        </Table.Cell>
+        <Table.Cell>{step.multiplier.toString()}</Table.Cell>
         {Object.keys(config.molecules).flatMap((m, i) => (
-          <td key={i}>{step.posterior[m].toPrecision(4)}</td>
+          <Table.Cell key={i}>{formatNumber(step.posterior[m])}</Table.Cell>
         ))}
-      </tr>
+      </Table.Row>
     );
   });
 
   return (
-    <table className="table">
-      <tbody>
-        <tr>
-          <th>Reaction</th>
-          <th>Multiplier</th>
+    <Table id="steps-table">
+      <Table.Caption>
+        <Typography variant="h2">Reaction steps</Typography>
+        <Typography variant="body_short">
+          Here each reaction that is applied is listed together with the
+          concentration after the reaction is applied. It is possible to follow
+          the concentration values one after another by including the
+          multiplier.
+        </Typography>
+      </Table.Caption>
+      <Table.Head sticky>
+        <Table.Row>
+          <Table.Cell>Reaction</Table.Cell>
+          <Table.Cell>Multiplier</Table.Cell>
           {Object.keys(config.molecules).flatMap((m, i) => (
-            <th key={i}>{config.molecules[m]}</th>
+            <Table.Cell key={i}>{config.molecules[m]}</Table.Cell>
           ))}
-        </tr>
+        </Table.Row>
+      </Table.Head>
+      <Table.Body>
         {initialRow}
         {rows}
-      </tbody>
-    </table>
+      </Table.Body>
+    </Table>
   );
 }
 
@@ -227,25 +257,15 @@ function Output({ inputs }: OutputProps) {
       </p>
     );
 
-    const detailedInfoDesc = (
-      <p>
-        Here each reaction that is applied is listed together with the
-        concentration after the reaction is applied. It is possible to follow
-        the concentration values one after another by including the multiplier.
-      </p>
-    );
-
     moreInfo = (
       <>
         <Row>
-          <Table resultData={resultData} />
+          <ResultTable resultData={resultData} row={cell[0]} column={cell[1]} />
         </Row>
         <Row>
-          {plotinfo}
           <Plot data={plotData} layout={{}} />
         </Row>
         <Row>
-          {detailedInfoDesc}
           <Details resultData={resultData} />
         </Row>
       </>
@@ -254,11 +274,12 @@ function Output({ inputs }: OutputProps) {
 
   return (
     <>
-      <p>
+      <Typography variant="h2">Results</Typography>
+      <Typography variant="body_short">
         The heatmap contains the value of the element specified above with the
         axes specified by row and column. Click on one of the values to get
         detailed information.
-      </p>
+      </Typography>
       <Row>
         <Plot
           data={[{ ...state.plot, type: "heatmap" }]}

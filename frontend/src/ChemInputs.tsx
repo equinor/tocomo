@@ -12,13 +12,26 @@ interface ChemInputProps {
   inputs: FormControl[];
   values: { [key: string]: number };
   onChange: (values: { [key: string]: number }) => void;
+  disabled?: boolean;
+  disabledInputs?: string[];
 }
 
-export function ChemInputs({ inputs, values, onChange }: ChemInputProps) {
+export function ChemInputs({
+  inputs,
+  values,
+  onChange,
+  disabled,
+  disabledInputs,
+}: ChemInputProps) {
   const fields = inputs.flatMap((input) => (
     <div key={input.name}>
       <TextField
         id={Math.random().toString()}
+        disabled={
+          disabled ||
+          (disabledInputs !== undefined &&
+            disabledInputs.find((v) => v === input.name))
+        }
         label={input.text}
         name={input.name}
         value={values[input.name]}

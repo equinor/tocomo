@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 
-import { Autocomplete, Button } from "@equinor/eds-core-react";
+import { Accordion, Autocomplete, Button } from "@equinor/eds-core-react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
@@ -75,20 +75,7 @@ function Form({ onSubmit }: FormProps) {
 
   return (
     <>
-      <p>
-        Specify the value for each element and run the reactions. Some
-        ingredients are only required for specific values, such as pipe
-        dimensions are only needed for calculating corrosion rate. These inputs
-        are hidden until required.
-      </p>
       <Row>
-        <Col>
-          <ChemInputs
-            inputs={config.inputs}
-            values={inputs}
-            onChange={setInputs}
-          />
-        </Col>
         <Col>
           <div
             style={{ display: "flex", flexDirection: "column", gap: "16px" }}
@@ -126,22 +113,39 @@ function Form({ onSubmit }: FormProps) {
           </div>
         </Col>
         <Col>
-          {valueValue.needsPipeInput ? (
-            <ChemInputs
-              inputs={config.pipeInputs}
-              values={pipeInputs}
-              onChange={setPipeInputs}
-            />
-          ) : null}
+          <ChemInputs
+            inputs={config.inputs}
+            values={inputs}
+            onChange={setInputs}
+            disabledInputs={[columnValue.name, rowValue.name]}
+          />
+        </Col>
+        <Col>
+          <ChemInputs
+            inputs={config.pipeInputs}
+            disabled={!valueValue.needsPipeInput}
+            values={pipeInputs}
+            onChange={setPipeInputs}
+          />
         </Col>
       </Row>
+
       <Row>
-        <Col className="d-grid">
-          <Button onClick={handleReset}>Reset Inputs</Button>
-        </Col>
-        <Col className="d-grid">
-          <Button onClick={handleSubmit}>Run Reactions</Button>
-        </Col>
+        <div>&nbsp;</div>
+        <div className="float-right">
+          <Button
+            color={"danger"}
+            variant={"outlined"}
+            className="my-3"
+            onClick={handleReset}
+          >
+            Reset Inputs
+          </Button>
+
+          <Button className="mx-4" onClick={handleSubmit}>
+            Run Reactions
+          </Button>
+        </div>
       </Row>
     </>
   );
