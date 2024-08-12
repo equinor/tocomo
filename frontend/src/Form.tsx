@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 
-import { Accordion, Autocomplete, Button } from "@equinor/eds-core-react";
+import { Autocomplete, Button } from "@equinor/eds-core-react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 

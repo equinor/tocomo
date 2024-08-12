@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 
 import { Form, SubmitParams } from "./Form";
 import { Output } from "./Output";
@@ -6,16 +6,7 @@ import { History } from "./History.tsx";
 import { Config, ConfigContext } from "./Config";
 
 import "./App.css";
-import {
-  Middle,
-  Accordion,
-  Button,
-  Divider,
-  Icon,
-  SideBar,
-  TopBar,
-  Typography,
-} from "@equinor/eds-core-react";
+import { Accordion, Icon, TopBar, Typography } from "@equinor/eds-core-react";
 import { apps } from "@equinor/eds-icons";
 
 function CalculationInformation() {
@@ -58,8 +49,30 @@ function CalculationInformation() {
   );
 }
 
+function getHistoryFromLocalStorage(): SubmitParams[] {
+  const history = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    const val = localStorage.getItem(key!);
+    history.push([key!, val!]);
+  }
+  return history
+    .sort((lhs, rhs) => rhs[0].localeCompare(lhs[0]))
+    .flatMap((v) => JSON.parse(v[1]));
+}
+
 function App() {
   const [inputs, setInputs] = useState<SubmitParams | null>(null);
+  const [history, setHistory] = useState(getHistoryFromLocalStorage);
+
+  const onFormSubmit = (inputs: SubmitParams) => {
+    setHistory([inputs, ...history]);
+    setInputs(inputs);
+    localStorage.setItem(
+      localStorage.length.toString(),
+      JSON.stringify(inputs),
+    );
+  };
 
   return (
     <>
@@ -70,18 +83,22 @@ function App() {
         </TopBar.Header>
       </TopBar>
       <Config>
-        <SideBar>
-          <SideBar.Content>
-            <SideBar.Toggle />
-            <SideBar.Button label="Hello" icon={apps} />
-            <SideBar.Footer>
-              <Divider size="2" color="light"></Divider>
-            </SideBar.Footer>
-          </SideBar.Content>
-        </SideBar>
-        <CalculationInformation />
-        <Form onSubmit={setInputs} />
-        <Output inputs={inputs} />
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-2">
+              <History
+                history={history}
+                onClear={() => setHistory([])}
+                setInput={(inputs) => setInputs(inputs)}
+              />
+            </div>
+            <div className="col-10">
+              <CalculationInformation />
+              <Form onSubmit={onFormSubmit} />
+              <Output inputs={inputs} />
+            </div>
+          </div>
+        </div>
       </Config>
     </>
   );

@@ -30,7 +30,7 @@ export function ChemInputs({
         disabled={
           disabled ||
           (disabledInputs !== undefined &&
-            disabledInputs.find((v) => v === input.name))
+            disabledInputs.find((v) => v === input.name) !== undefined)
         }
         label={input.text}
         name={input.name}

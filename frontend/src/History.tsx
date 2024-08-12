@@ -1,58 +1,47 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { ConfigContext } from "./Config.tsx";
 import { Button } from "@equinor/eds-core-react";
-import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
+import { SubmitParams } from "./Form.tsx";
 
-interface CardProps {
-  inputs: { [key: string]: string };
-  active?: boolean;
-}
-function Card({ inputs, active }: CardProps) {
-  const config = useContext(ConfigContext);
-
-  return <Button aria-label="save action">A</Button>;
-
-  return (
-    <Button fullWidth={true}>
-      {Object.entries(inputs).flatMap(([key, val], i) => (
-        <span className="px-3" key={i}>{`${names[key]}: ${val}`}</span>
-      ))}
-    </Button>
-  );
+interface HistoryProps {
+  history: SubmitParams[];
+  onClear: () => void;
+  setInput: (inputs: SubmitParams) => void;
 }
 
-export function History() {
+export function History(props: HistoryProps) {
   const config = useContext(ConfigContext);
 
-  const inputs = {};
+  const inputs: { [key: string]: number } = {};
   for (const input of config.inputs) {
     inputs[input.name] = input.init!;
   }
 
-  const history = [1, 2, 3];
-
-  const names = {};
+  const names: { [key: string]: string } = {};
   for (const input of config.inputs) {
     names[input.name] = input.text;
   }
 
+  const onClear = () => {
+    localStorage.clear();
+    props.onClear();
+  };
+
   return (
     <>
       <Button.Toggle vertical>
-        {history.flatMap((i) => {
+        {props.history.flatMap((hist, index) => {
           return (
-            <Button key={i}>
-              <Row>
-                <Col>
-                  {Object.entries(inputs).flatMap(([key, val], i) => (
-                    <th>{names[key]}</th>
-                  ))}
-                </Col>
-              </Row>
+            <Button key={index} onClick={() => props.setInput(hist)}>
+              {Object.entries(hist.inputs).flatMap(([key, val]) => (
+                <span>{`${names[key]}: ${val}`}</span>
+              ))}
             </Button>
           );
         })}
+        <Button color="danger" variant="outlined" onClick={onClear}>
+          Clear
+        </Button>
       </Button.Toggle>
     </>
   );

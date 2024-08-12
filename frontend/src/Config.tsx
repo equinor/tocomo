@@ -30,7 +30,7 @@ export const ConfigContext = createContext<Config>(defaultConfig);
 
 type Child = React.ReactElement<{ config: Config }, string>;
 
-export function Config({ children }: { children: Child[] }) {
+export function Config({ children }: { children: Child }) {
   const [config, setConfig] = useState<Config | null>(null);
 
   useEffect(() => {

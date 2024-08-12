@@ -64,8 +64,6 @@ function ResultTable({
     <Table.Cell key={i}>{formatNumber(resultData.aggregated[x])}</Table.Cell>
   ));
 
-  const explanation = <></>;
-
   return (
     <>
       <p></p>
@@ -247,21 +245,19 @@ function Output({ inputs }: OutputProps) {
         type: "scatter",
       };
     });
-    const plotinfo = (
-      <p>
-        The plot shows the concentration of each element after a reaction has
-        been applied. The first and last set of values on the y axis represents
-        the initial and final conditions. The plot is interactive and you can
-        hide individual lines (by clicking on their legend), and hover to get
-        exact values.
-      </p>
-    );
 
     moreInfo = (
       <>
         <Row>
           <ResultTable resultData={resultData} row={cell[0]} column={cell[1]} />
         </Row>
+        <Typography variant="body_short">
+          The plot shows the concentration of each element after a reaction has
+          been applied. The first and last set of values on the y axis
+          represents the initial and final conditions. The plot is interactive
+          and you can hide individual lines (by clicking on their legend), and
+          hover to get exact values.
+        </Typography>
         <Row>
           <Plot data={plotData} layout={{}} />
         </Row>
