@@ -8,7 +8,7 @@ spec:
       build:
         from: main
   dnsAlias:
-    - alias: co2specdemo
+    - alias: co2spec
       component: frontend
       environment: dev
   components:
