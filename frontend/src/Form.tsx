@@ -53,15 +53,6 @@ function Form({ onSubmit }: FormProps) {
     getDefaultOption(config.value, config.inputs, config.outputs),
   );
 
-  const handleReset = () => {
-    setInputs(() => getDefaultValues(config.inputs));
-    setPipeInputs(() => getDefaultValues(config.pipeInputs));
-    setColumnValue(() => getDefaultOption(config.column, config.inputs));
-    setRowValue(() => getDefaultOption(config.row, config.inputs));
-    setValueValue(() =>
-      getDefaultOption(config.row, config.inputs, config.outputs),
-    );
-  };
 
   const handleSubmit = () => {
     onSubmit({
@@ -131,17 +122,7 @@ function Form({ onSubmit }: FormProps) {
       </Row>
 
       <Row>
-        <div>&nbsp;</div>
         <div className="float-right">
-          <Button
-            color={"danger"}
-            variant={"outlined"}
-            className="my-3"
-            onClick={handleReset}
-          >
-            Reset Inputs
-          </Button>
-
           <Button className="mx-4" onClick={handleSubmit}>
             Run Reactions
           </Button>
