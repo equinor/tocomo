@@ -1,7 +1,7 @@
 apiVersion: radix.equinor.com/v1
 kind: RadixApplication
 metadata:
-  name: c2d2-web-portal-test
+  name: co2specdemo
 spec:
   environments:
     - name: dev
