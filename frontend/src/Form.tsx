@@ -53,7 +53,6 @@ function Form({ onSubmit }: FormProps) {
     getDefaultOption(config.value, config.inputs, config.outputs),
   );
 
-
   const handleSubmit = () => {
     onSubmit({
       inputs,
