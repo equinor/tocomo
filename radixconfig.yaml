@@ -7,6 +7,9 @@ spec:
     - name: dev
       build:
         from: main
+    - name: test
+      build:
+        from: main
   dnsAlias:
     - alias: co2spec
       component: frontend
@@ -27,6 +30,11 @@ spec:
           sessionStoreType: redis
           redisStore:
             connectionUrl: redis://redis:6379
+      environmentConfig:
+        - environment: test
+          authentication:
+            oauth2:
+              scope: openid profile email offline_access data_access
     - name: redis
       image: bitnami/redis:latest
       secrets:
