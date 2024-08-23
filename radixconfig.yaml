@@ -3,6 +3,9 @@ kind: RadixApplication
 metadata:
   name: co2specdemo
 spec:
+  build:
+    variables:
+      OAUTH_SCOPE: openid profile email offline_access
   environments:
     - name: dev
       build:
@@ -21,7 +24,7 @@ spec:
       authentication:
         oauth2:
           clientId: a4f4519a-fafb-48c2-9a5c-3ba38309a824
-          scope: openid profile email offline_access
+          scope: OAUTH_SCOPE
           setXAuthRequestHeaders: true
           setAuthorizationHeader: true
           sessionStoreType: redis
@@ -43,7 +46,7 @@ spec:
       authentication:
         oauth2:
           clientId: a4f4519a-fafb-48c2-9a5c-3ba38309a824
-          scope: openid profile email offline_access
+          scope: OAUTH_SCOPE
           setXAuthRequestHeaders: true
           setAuthorizationHeader: true
           sessionStoreType: redis
