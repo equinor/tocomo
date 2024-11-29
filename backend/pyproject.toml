@@ -16,11 +16,15 @@ python = "^3.11"
 fastapi = {extras = ["all"], version = "^0.111.1"}
 uvicorn = "^0.30.3"
 pandas = "^2.2.2"
+pyjwt = {extras = ["crypto"], version = "^2.10.1"}
+python-dotenv = "^1.0.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
 mypy = "^1.11.1"
 pandas-stubs = "^2.2.2.240603"
+flake8 = "^7.1.1"
+flake8-bugbear = "^24.10.31"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
