@@ -1,28 +1,43 @@
 from __future__ import annotations
-from typing import Any, Annotated
-from io import StringIO
-from contextlib import redirect_stdout
+
+import os
 from dataclasses import dataclass
+from typing import Annotated, Any
 
-from fastapi import FastAPI, Request
-from pydantic import BaseModel, Field
-import itertools
 import numpy as np
-import pandas as pd
+from dotenv import load_dotenv
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-from .reactions import MOLECULE_TEXT, REACTIONS, Molecule, Result, run_model_sm1
-from .corrosion_calc import surface_area, corrosion_rate_HNO3, corrosion_rate_H2SO4
-
-
 from fastapi.responses import RedirectResponse
+from pydantic import BaseModel, Field
 
-app = FastAPI(debug=True)
+from co2specdemo_backend.authentication import authenticated_user_claims
+from co2specdemo_backend.corrosion_calc import (
+    corrosion_rate_H2SO4,
+    corrosion_rate_HNO3,
+    surface_area,
+)
+from co2specdemo_backend.reactions import (
+    MOLECULE_TEXT,
+    REACTIONS,
+    Molecule,
+    Result,
+    run_model_sm1,
+)
+
+load_dotenv()  # take environment variables from .env.
+
+app = FastAPI(dependencies=[Depends(authenticated_user_claims)])
+app.swagger_ui_init_oauth = {
+    "clientId": os.environ.get("CLIENT_ID"),
+    "appName": "CO2Spec API",
+    "usePkceWithAuthorizationCodeGrant": True,  # Enable PKCE
+    "scope": os.environ.get("API_SCOPE"),
+}
 
 origins = [
     "http://localhost:3000",
-    "https://co2spec.playground.radix.equinor.com",
-    "https://frontend-c2d2-web-portal-test-dev.playground.radix.equinor.com",
+    "https://co2spec.radix.equinor.com",
 ]
 
 
@@ -130,6 +145,37 @@ class RunMatrix(BaseModel):
     pipe_inputs: dict[str, float] = Field(default_factory=dict, alias="pipeInputs")
 
 
+class Concentrations(BaseModel):
+    h2o: float = Field(default=30)
+    o2: float = Field(default=30)
+    so2: float = Field(default=10)
+    no2: float = Field(default=20)
+    h2s: float = Field(default=0)
+    no: float = Field(default=0)
+    h2so4: float = Field(default=0)
+    hno3: float = Field(default=0)
+
+
+class RunReactionResult(BaseModel):
+    initial: Concentrations
+    final: Concentrations
+    change: Concentrations
+
+
+@app.post("/api/run_reaction")
+async def run_reaction(input_concs: Concentrations) -> RunReactionResult:
+    result = run_model_sm1(
+        {Molecule[k.upper()]: v for k, v in input_concs.model_dump().items()}
+    )
+    keys = set(result.final.keys()).union(set(result.initial.keys()))
+    change = {k: result.final.get(k, 0) - result.initial.get(k, 0) for k in keys}
+    return RunReactionResult(
+        initial=Concentrations.model_validate(result.initial),
+        final=Concentrations.model_validate(result.final),
+        change=Concentrations.model_validate(change),
+    )
+
+
 @app.post("/api/run_matrix")
 async def run_matrix(data: RunMatrix) -> dict[str, Any]:
     xrange = np.arange(0.5, 10.5, 0.5)
@@ -193,3 +239,9 @@ async def run_matrix(data: RunMatrix) -> dict[str, Any]:
 @app.get("/")
 async def root() -> RedirectResponse:
     return RedirectResponse("/docs")
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("co2specdemo_backend.app:app", host="localhost", port=5005, reload=True)
