@@ -24,13 +24,15 @@ spec:
       authentication:
         oauth2:
           clientId: a4f4519a-fafb-48c2-9a5c-3ba38309a824
-          scope: openid profile email offline_access
           setXAuthRequestHeaders: true
           setAuthorizationHeader: true
           sessionStoreType: redis
           redisStore:
             connectionUrl: redis://redis:6379
       environmentConfig:
+        - environment: dev
+          authentication:
+            oauth2: openid profile email offline_access api://a4f4519a-fafb-48c2-9a5c-3ba38309a824/co2specdemo.user
         - environment: test
           authentication:
             oauth2:
