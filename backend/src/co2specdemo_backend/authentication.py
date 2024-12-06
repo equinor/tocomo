@@ -1,11 +1,11 @@
 import logging
 import os
-from typing import Annotated, Any
+from typing import Any
 
 import httpx
 import jwt
 import jwt.algorithms
-from fastapi import Depends, HTTPException, Request, Security
+from fastapi import HTTPException, Security
 from fastapi.security import OAuth2AuthorizationCodeBearer
 
 logger = logging.getLogger(__name__)
@@ -35,23 +35,8 @@ oauth2_scheme = Security(
 )
 
 
-def get_token(request: Request, security: Annotated[str, oauth2_scheme]) -> str:
-    # Extract the token from the X-Auth-Request-Access-Token header
-    token = request.headers.get("X-Auth-Request-Access-Token")
-
-    # If the token is not provided in X-Auth-Request-Access-Token, fallback to Authorization header
-    if not token:
-        token = security
-
-    # If still no token, raise an exception
-    if not token:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-
-    return token
-
-
 def authenticated_user_claims(
-    jwt_token: Annotated[str, Depends(get_token)],
+    jwt_token: str = oauth2_scheme,
 ) -> Any:
     if not jwt_token:
         raise HTTPException(401, "Missing token in Authorization header")
