@@ -7,10 +7,11 @@ import jwt
 import jwt.algorithms
 from fastapi import HTTPException, Security
 from fastapi.security import OAuth2AuthorizationCodeBearer
+from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
 
-
+load_dotenv()
 OPEN_ID_CONFIG_URI = "https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0/v2.0/.well-known/openid-configuration"
 CLIENT_ID = os.environ.get("CLIENT_ID", "")
 
