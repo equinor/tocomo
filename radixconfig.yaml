@@ -10,6 +10,7 @@ spec:
     - name: test
       build:
         from: main
+    - name: prod
   dnsAlias:
     - alias: co2spec
       component: frontend
@@ -38,6 +39,10 @@ spec:
           authentication:
             oauth2:
               scope: openid profile email offline_access api://a4f4519a-fafb-48c2-9a5c-3ba38309a824/data_access
+        - environment: prod
+          authentication:
+            oauth2:
+              scope: openid profile email offline_access
     - name: redis
       image: bitnami/redis:latest
       secrets:
