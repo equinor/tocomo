@@ -14,7 +14,7 @@ spec:
   dnsAlias:
     - alias: co2spec
       component: frontend
-      environment: dev
+      environment: prod
   components:
     - name: frontend
       ports:
