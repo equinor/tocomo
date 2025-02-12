@@ -165,7 +165,7 @@ class RunReactionResult(BaseModel):
 @app.post("/api/run_reaction")
 async def run_reaction(input_concs: Concentrations) -> RunReactionResult:
     result = run_model_sm1(
-        {Molecule[k.upper()]: v for k, v in input_concs.model_dump().items()}
+        {Molecule[k.upper()]: v*1e6 for k, v in input_concs.model_dump().items()}
     )
     keys = set(result.final.keys()).union(set(result.initial.keys()))
     change = {k: result.final.get(k, 0) - result.initial.get(k, 0) for k in keys}
