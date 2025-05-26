@@ -59,9 +59,9 @@ spec:
       environmentConfig:
         - environment: prod
           variables:
-            CLIENT_ID: a4f4519a-fafb-48c2-9a5c-3ba38309a8246
+            CLIENT_ID: a4f4519a-fafb-48c2-9a5c-3ba38309a824
             API_SCOPE: api://a4f4519a-fafb-48c2-9a5c-3ba38309a824/co2specdemo.user
         - environment: dev
           variables:
-            CLIENT_ID: a4f4519a-fafb-48c2-9a5c-3ba38309a8246
+            CLIENT_ID: a4f4519a-fafb-48c2-9a5c-3ba38309a824
             API_SCOPE: api://a4f4519a-fafb-48c2-9a5c-3ba38309a824/co2specdemo.user
