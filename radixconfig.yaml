@@ -57,6 +57,10 @@ spec:
           port: 5005
       publicPort: http
       environmentConfig:
+        - environment: prod
+          variables:
+            CLIENT_ID: a4f4519a-fafb-48c2-9a5c-3ba38309a8246
+            API_SCOPE: api://a4f4519a-fafb-48c2-9a5c-3ba38309a824/co2specdemo.user
         - environment: dev
           variables:
             CLIENT_ID: a4f4519a-fafb-48c2-9a5c-3ba38309a8246
