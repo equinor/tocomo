@@ -146,10 +146,10 @@ class RunMatrix(BaseModel):
 
 
 class Concentrations(BaseModel):
-    h2o: float = Field(default=30)
-    o2: float = Field(default=30)
-    so2: float = Field(default=10)
-    no2: float = Field(default=20)
+    h2o: float = Field(default=0)
+    o2: float = Field(default=0)
+    so2: float = Field(default=0)
+    no2: float = Field(default=0)
     h2s: float = Field(default=0)
     no: float = Field(default=0)
     h2so4: float = Field(default=0)
