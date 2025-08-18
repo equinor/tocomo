@@ -1,7 +1,8 @@
 from fastapi.testclient import TestClient
 
-from co2specdemo_backend.app import app
+from co2specdemo_backend.app import app, Concentrations
 from co2specdemo_backend.authentication import authenticated_user_claims
+from co2specdemo_backend.reactions import Molecule
 
 
 def override_authenticated_user_claims():
@@ -13,6 +14,15 @@ def override_authenticated_user_claims():
 
 
 app.dependency_overrides[authenticated_user_claims] = override_authenticated_user_claims
+
+
+def test_all_molecule_should_be_in_concentrations():
+    # a bit silly test, but we have to ensure that we have all molecules
+    # exist in the Concentrations class, as otherwise valid molecules
+    # that are not present will be dropped from the api response
+    expected = [str(entry) for entry in Molecule]
+    for field_name, _ in Concentrations():
+        assert field_name in expected
 
 
 def test_root_should_redirect_to_docs():
@@ -34,6 +44,8 @@ def test_run_reaction():
         "no": 6,
         "h2so4": 0,
         "hno3": 0,
+        "hno2": 0,
+        "s8": 0,
     }
     response = test_client.post(
         "/api/run_reaction",
