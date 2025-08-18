@@ -198,3 +198,18 @@ def normalize(concentrations):
 def test_run_model_sm1_cases(initial, expected):
     result = run_model_sm1(initial)
     assert normalize(result.final) == normalize(expected)
+
+
+def test_rhs_reactions_missing():
+    # Ensure we can handle that rhs components are defaulted to 0
+    # so we can handle them missing. In this setup, all components on
+    # the left hand side is present, and all but 1 (NO) on rhs is there.
+    concentrations = {
+        M.NO2: 10.0,
+        M.H2S: 100.0,
+        M.SO2: 10.0,
+        M.H2O: 10.0,
+    }
+
+    result = run_model_sm1(concentrations)
+    assert M.NO in result.final

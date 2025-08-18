@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from contextlib import redirect_stdout
+from collections import defaultdict
 from dataclasses import dataclass
 from enum import StrEnum, auto
-import io
 from typing import Annotated
 from pydantic import BaseModel, Field
 
@@ -136,8 +135,8 @@ def run_model_sm1(initial_concentrations: dict[Molecule, float]) -> Result:
     """
 
     # Clone input
-    concentrations = {**initial_concentrations}
-    aggregated_concentrations = {**initial_concentrations}
+    concentrations = defaultdict(lambda: 0, initial_concentrations)
+    aggregated_concentrations = defaultdict(lambda: 0, initial_concentrations)
 
     steps: list[_Step] = []
     while True:
