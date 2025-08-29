@@ -27,9 +27,7 @@ spec:
           clientId: a4f4519a-fafb-48c2-9a5c-3ba38309a824
           setXAuthRequestHeaders: true
           setAuthorizationHeader: true
-          sessionStoreType: redis
-          redisStore:
-            connectionUrl: redis://redis:6379
+          sessionStoreType: systemManaged
       environmentConfig:
         - environment: dev
           authentication:
@@ -43,13 +41,6 @@ spec:
           authentication:
             oauth2:
               scope: openid profile email offline_access api://a4f4519a-fafb-48c2-9a5c-3ba38309a824/co2specdemo.user
-    - name: redis
-      image: bitnami/redis:latest
-      secrets:
-        - REDIS_PASSWORD
-      ports:
-        - name: redis
-          port: 6379
     - name: backend
       src: backend
       ports:
