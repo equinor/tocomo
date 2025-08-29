@@ -2,10 +2,3 @@
 inputs:
   nixpkgs:
     url: github:cachix/devenv-nixpkgs/rolling
-
-  # Required for poetry to work with devenv 1.0.7
-  devenv:
-    url: github:pinkwah/devenv/poetry-fix
-    inputs:
-      cachix:
-        follows: devenv

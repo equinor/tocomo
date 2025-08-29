@@ -22,7 +22,9 @@
     directory = "backend";
     enable = true;
 
+    package = pkgs.python312;
     poetry.enable = true;
+    poetry.install.enable = true;
   };
 
   processes.backend.exec = "
@@ -45,11 +47,10 @@
     npm run build
   '';
 
-  pre-commit.hooks = {
+  git-hooks.hooks = {
     black.enable = true;
 
-    nixfmt.enable = true;
-    nixfmt.package = pkgs.nixfmt-rfc-style;
+    nixfmt-rfc-style.enable = true;
 
     prettier.enable = true;
     prettier.settings.parser = "typescript";
