@@ -1,7 +1,7 @@
 apiVersion: radix.equinor.com/v1
 kind: RadixApplication
 metadata:
-  name: co2specdemo
+  name: tocomo
 spec:
   environments:
     - name: dev
@@ -12,7 +12,7 @@ spec:
         from: main
     - name: prod
   dnsAlias:
-    - alias: co2spec
+    - alias: tocomo
       component: frontend
       environment: prod
   components:

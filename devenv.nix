@@ -29,7 +29,7 @@
 
   processes.backend.exec = "
     export PYTHONPATH=$PWD/backend/src:$PYTHONPATH
-    python -m co2specdemo_backend
+    python -m tocomo
   ";
 
   processes.frontend.exec = ''

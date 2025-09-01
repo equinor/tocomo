@@ -1,15 +1,15 @@
 [tool.poetry]
-name = "co2specdemo-backend"
+name = "tocomo"
 version = "0.1.0"
-description = "Backend for CO2SpecDemo"
+description = "Backend for ToCoMo"
 authors = [
   "Anna Kvashchuk <akvas@equinor.com>",
   "Lars Petter Øren Hauge <lpha@equinor.com>",
   "Olve Maudal <olvm@equinor.com>",
   "Zohar Malamant <zom@equinor.com>",
 ]
-repository = "https://github.com/equinor/co2specdemo"
-packages = [{ include = "co2specdemo_backend", from = "src" }]
+repository = "https://github.com/equinor/tocomo"
+packages = [{ include = "tocomo", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
