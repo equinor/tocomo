@@ -16,7 +16,6 @@ python = "^3.11"
 fastapi = {extras = ["all"], version = "^0.111.1"}
 uvicorn = "^0.30.3"
 pandas = "^2.2.2"
-pyjwt = {extras = ["crypto"], version = "^2.10.1"}
 python-dotenv = "^1.0.1"
 
 [tool.poetry.group.dev.dependencies]
