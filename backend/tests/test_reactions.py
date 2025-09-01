@@ -1,10 +1,10 @@
 import pytest
-from co2specdemo_backend.reactions import (
+from tocomo.reactions import (
     M,
     Reaction,
     run_model_sm1,
 )
-from co2specdemo_backend.corrosion_calc import (
+from tocomo.corrosion_calc import (
     convert_iron_rate,
     corrosion_rate,
     H2SO4_MOL_WEIGHT,

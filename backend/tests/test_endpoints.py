@@ -1,8 +1,8 @@
 from fastapi.testclient import TestClient
 
-from co2specdemo_backend.app import app, Concentrations
-from co2specdemo_backend.authentication import authenticated_user_claims
-from co2specdemo_backend.reactions import Molecule
+from tocomo.app import app, Concentrations
+from tocomo.authentication import authenticated_user_claims
+from tocomo.reactions import Molecule
 
 
 def override_authenticated_user_claims():

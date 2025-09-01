@@ -1,14 +1,11 @@
-# CO<sub>2</sub>specdemo
+# ToCoMo
 
-This CO<sub>2</sub> spec demo calculator was made to democratize the dicussions
+The Total Consumption Model (ToCoMo) calculator was made to democratize the dicussions
 about the consequences of mixing liquid CO<sub>2</sub> with impurities. Current
 focus is to implement that algorithms as described by Sven Morten Hesjevik and
 Anne Marie Koren Halvorsen.
 
-Useful links:
-- The application as hosted on Radix [https://co2spec.radix.equinor.com](https://co2spec.radix.equinor.com)
-- The CO<sub>2</sub> impurities [SDP](https://colab.equinor.com/technologies/103E7E25-DE69-4ED0-8A35-AC91C41AD524/summary) T21-00334
-- Description of our [activity](https://ccs-data-digital.radix.equinor.com/activities/co2spec/)
+The application as hosted on Radix [https://tocomo.radix.equinor.com](https://tocomo.radix.equinor.com)
 
 ## Local setup (also on Codespace)
 

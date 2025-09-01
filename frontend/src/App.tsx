@@ -19,9 +19,9 @@ function CalculationInformation() {
         <Accordion.Panel>
           <section className="copy">
             <Typography variant="body_long">
-              The CO₂ specification calculator provides a way to give an
-              estimate of concentrations given a known input. A set of equations
-              are applied in order:
+              The Total Consumption Model provides a way to give an estimate of
+              concentrations given a known input. A set of equations are applied
+              in order:
             </Typography>
 
             <div>
@@ -79,7 +79,7 @@ function App() {
       <TopBar>
         <TopBar.Header>
           <Icon data={apps} />
-          CO₂ spec demo
+          Total Consumption Model
         </TopBar.Header>
       </TopBar>
       <Config>

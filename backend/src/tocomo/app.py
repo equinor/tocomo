@@ -11,13 +11,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
 
-from co2specdemo_backend.authentication import authenticated_user_claims
-from co2specdemo_backend.corrosion_calc import (
+from tocomo.authentication import authenticated_user_claims
+from tocomo.corrosion_calc import (
     corrosion_rate_H2SO4,
     corrosion_rate_HNO3,
     surface_area,
 )
-from co2specdemo_backend.reactions import (
+from tocomo.reactions import (
     MOLECULE_TEXT,
     REACTIONS,
     Molecule,
@@ -30,14 +30,14 @@ load_dotenv()  # take environment variables from .env.
 app = FastAPI(dependencies=[Depends(authenticated_user_claims)])
 app.swagger_ui_init_oauth = {
     "clientId": os.environ.get("CLIENT_ID"),
-    "appName": "CO2Spec API",
+    "appName": "Tocomo API",
     "usePkceWithAuthorizationCodeGrant": True,  # Enable PKCE
     "scope": os.environ.get("API_SCOPE"),
 }
 
 origins = [
     "http://localhost:3000",
-    "https://co2spec.radix.equinor.com",
+    "https://tocomo.radix.equinor.com",
 ]
 
 
@@ -246,4 +246,4 @@ async def root() -> RedirectResponse:
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("co2specdemo_backend.app:app", host="localhost", port=5005, reload=True)
+    uvicorn.run("tocomo.app:app", host="localhost", port=5005, reload=True)

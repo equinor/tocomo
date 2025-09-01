@@ -31,7 +31,7 @@ oauth2_scheme = Security(
         authorizationUrl=oid_conf["authorization_endpoint"],
         tokenUrl=oid_conf["token_endpoint"],
         auto_error=False,
-        scopes={os.environ.get("API_SCOPE", ""): "Access to the co2spec API"},
+        scopes={os.environ.get("API_SCOPE", ""): "Access to the tocomo API"},
     )
 )
 
