@@ -22,37 +22,9 @@ spec:
           port: 3000
       publicPort: http
       src: frontend
-      authentication:
-        oauth2:
-          clientId: a4f4519a-fafb-48c2-9a5c-3ba38309a824
-          setXAuthRequestHeaders: true
-          setAuthorizationHeader: true
-          sessionStoreType: systemManaged
-      environmentConfig:
-        - environment: dev
-          authentication:
-            oauth2:
-              scope: openid profile email offline_access api://a4f4519a-fafb-48c2-9a5c-3ba38309a824/co2specdemo.user
-        - environment: test
-          authentication:
-            oauth2:
-              scope: openid profile email offline_access api://a4f4519a-fafb-48c2-9a5c-3ba38309a824/co2specdemo.user
-        - environment: prod
-          authentication:
-            oauth2:
-              scope: openid profile email offline_access api://a4f4519a-fafb-48c2-9a5c-3ba38309a824/co2specdemo.user
     - name: backend
       src: backend
       ports:
         - name: http
           port: 5005
       publicPort: http
-      environmentConfig:
-        - environment: prod
-          variables:
-            CLIENT_ID: a4f4519a-fafb-48c2-9a5c-3ba38309a824
-            API_SCOPE: api://a4f4519a-fafb-48c2-9a5c-3ba38309a824/co2specdemo.user
-        - environment: dev
-          variables:
-            CLIENT_ID: a4f4519a-fafb-48c2-9a5c-3ba38309a824
-            API_SCOPE: api://a4f4519a-fafb-48c2-9a5c-3ba38309a824/co2specdemo.user
