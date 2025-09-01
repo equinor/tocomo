@@ -1,19 +1,7 @@
 from fastapi.testclient import TestClient
 
 from tocomo.app import app, Concentrations
-from tocomo.authentication import authenticated_user_claims
 from tocomo.reactions import Molecule
-
-
-def override_authenticated_user_claims():
-    return {
-        "oid": "the_oid",
-        "upn": "theauthenticateduser@equinor.com",
-        "roles": [],
-    }
-
-
-app.dependency_overrides[authenticated_user_claims] = override_authenticated_user_claims
 
 
 def test_all_molecule_should_be_in_concentrations():

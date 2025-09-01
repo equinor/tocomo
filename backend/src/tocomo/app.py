@@ -1,17 +1,15 @@
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass
 from typing import Annotated, Any
 
 import numpy as np
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
 
-from tocomo.authentication import authenticated_user_claims
 from tocomo.corrosion_calc import (
     corrosion_rate_H2SO4,
     corrosion_rate_HNO3,
@@ -26,14 +24,7 @@ from tocomo.reactions import (
 )
 
 load_dotenv()  # take environment variables from .env.
-
-app = FastAPI(dependencies=[Depends(authenticated_user_claims)])
-app.swagger_ui_init_oauth = {
-    "clientId": os.environ.get("CLIENT_ID"),
-    "appName": "Tocomo API",
-    "usePkceWithAuthorizationCodeGrant": True,  # Enable PKCE
-    "scope": os.environ.get("API_SCOPE"),
-}
+app = FastAPI()
 
 origins = [
     "http://localhost:3000",
