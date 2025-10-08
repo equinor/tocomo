@@ -153,6 +153,7 @@ class RunReactionResult(BaseModel):
     initial: Concentrations
     final: Concentrations
     change: Concentrations
+    steps: list[Any] = []
 
 
 @app.post("/api/run_reaction")
@@ -162,10 +163,22 @@ async def run_reaction(input_concs: Concentrations) -> RunReactionResult:
     )
     keys = set(result.final.keys()).union(set(result.initial.keys()))
     change = {k: result.final.get(k, 0) - result.initial.get(k, 0) for k in keys}
+    steps = []
+    for step in result.steps:
+        steps.append(
+            {
+                "Index": str(step.reaction_index),
+                "Reaction": FORM_CONFIG.reactions[step.reaction_index],
+                "Multiplier": step.multiplier,
+                **{MOLECULE_TEXT[m]: c for m, c in step.posterior.items()},
+            }
+        )
+
     return RunReactionResult(
         initial=Concentrations.model_validate(result.initial),
         final=Concentrations.model_validate(result.final),
         change=Concentrations.model_validate(change),
+        steps=steps,
     )
 
 
