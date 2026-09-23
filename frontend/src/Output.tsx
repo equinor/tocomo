@@ -5,7 +5,8 @@ import Row from "react-bootstrap/Row";
 import { baseUrl } from "./util";
 import { SubmitParams } from "./Form";
 import Plot from "react-plotly.js";
-import { ConfigContext } from "./Config";
+import * as Plotly from "plotly.js";
+import { ConfigContext } from "./ConfigContext";
 
 import { Table, Typography } from "@equinor/eds-core-react";
 
@@ -199,13 +200,19 @@ function Output({ inputs }: OutputProps) {
 
   const layout: Partial<Plotly.Layout> = {
     autosize: true,
-    title: config.molecules[inputs.valueValue],
+    title: {
+      text: config.molecules[inputs.valueValue],
+    },
     yaxis: {
-      title: config.molecules[inputs.rowValue],
+      title: {
+        text: config.molecules[inputs.rowValue],
+      },
       autorange: "reversed",
     },
     xaxis: {
-      title: config.molecules[inputs.columnValue],
+      title: {
+        text: config.molecules[inputs.columnValue],
+      },
     },
     annotations: [],
   };
@@ -234,7 +241,7 @@ function Output({ inputs }: OutputProps) {
   if (cell !== null) {
     const resultData = state.resultData[cell[0]][cell[1]];
 
-    const plotData: Partial<Plotly.PlotData>[] = Object.keys(
+    const plotData: Partial<Plotly.Data>[] = Object.keys(
       config.molecules,
     ).flatMap((m) => {
       return {

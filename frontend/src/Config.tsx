@@ -1,32 +1,6 @@
-import React, { createContext, useEffect, useState } from "react";
-import { FormControl } from "./ChemInputs";
+import React, { useEffect, useState } from "react";
+import { type Config, ConfigContext } from "./ConfigContext";
 import { baseUrl } from "./util";
-
-export interface Config {
-  inputs: FormControl[];
-  pipeInputs: FormControl[];
-  outputs: FormControl[];
-  column: string;
-  row: string;
-  value: string;
-  molecules: { [key: string]: string };
-  reactions: { [key: string]: string };
-  reaction_order: number[];
-}
-
-const defaultConfig: Config = {
-  inputs: [],
-  pipeInputs: [],
-  outputs: [],
-  column: "",
-  row: "",
-  value: "",
-  molecules: {},
-  reactions: {},
-  reaction_order: [],
-};
-
-export const ConfigContext = createContext<Config>(defaultConfig);
 
 type Child = React.ReactElement<{ config: Config }, string>;
 

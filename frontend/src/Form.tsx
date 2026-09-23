@@ -5,7 +5,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 import { ChemInputs, FormControl } from "./ChemInputs";
-import { ConfigContext } from "./Config";
+import { ConfigContext } from "./ConfigContext";
 
 interface SubmitParams {
   inputs: { [key: string]: number };
