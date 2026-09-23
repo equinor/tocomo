@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { ConfigContext } from "./Config.tsx";
+import { ConfigContext } from "./ConfigContext";
 import { Button } from "@equinor/eds-core-react";
 import { SubmitParams } from "./Form.tsx";
 

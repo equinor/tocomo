@@ -3,7 +3,8 @@ import { useState, useContext } from "react";
 import { Form, SubmitParams } from "./Form";
 import { Output } from "./Output";
 import { History } from "./History.tsx";
-import { Config, ConfigContext } from "./Config";
+import { ConfigContext } from "./ConfigContext";
+import { Config } from "./Config";
 
 import "./App.css";
 import { Accordion, Icon, TopBar, Typography } from "@equinor/eds-core-react";

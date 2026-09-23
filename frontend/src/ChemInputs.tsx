@@ -26,7 +26,6 @@ export function ChemInputs({
   const fields = inputs.flatMap((input) => (
     <div key={input.name}>
       <TextField
-        id={Math.random().toString()}
         disabled={
           disabled ||
           (disabledInputs !== undefined &&
