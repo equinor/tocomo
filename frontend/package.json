@@ -20,7 +20,7 @@
     "react-bootstrap": "^2.10.4",
     "react-dom": "^18.2.0",
     "react-plotly.js": "^2.6.0",
-    "styled-components": "^6.1.11"
+    "styled-components": "^6.5.3"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",
@@ -33,6 +33,6 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
     "typescript": "^5.5.3",
-    "vite": "^7.1.9"
+    "vite": "^7.3.7"
   }
 }
